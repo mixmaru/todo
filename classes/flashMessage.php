@@ -11,7 +11,7 @@
 namespace classes;
 
 
-class flashMessage
+class FlashMessage
 {
     /**
      * @param $message flashメッセージセット

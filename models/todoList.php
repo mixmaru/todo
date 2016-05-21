@@ -11,7 +11,7 @@
 namespace models;
 
 
-class todoList
+class TodoList
 {
     private $models;
 

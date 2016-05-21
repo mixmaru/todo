@@ -11,7 +11,7 @@
 namespace classes;
 
 
-class response
+class Response
 {
     /**
      * @param $template_path テンプレートファイルのパス

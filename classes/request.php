@@ -11,7 +11,7 @@
 namespace classes;
 
 
-class request
+class Request
 {
     /**
      * @return string

@@ -10,11 +10,11 @@
 
 namespace models;
 
-class todo
+class Todo
 {
     private $id;
-    private $checked;
-    private $tilte;
+    private $done;
+    private $title;
     private $limit_date;
     private $view_order;
     private $create_date;
@@ -27,7 +27,12 @@ class todo
      * なければ、すべてnullのデータをインスタンス化する
      */
     public function __construct($id = null){
-
+        /*todo:
+        //いちどだけDB接続を実行する
+        if($id !== null){
+            //データをロードする
+        }
+        */
     }
 
     /**
@@ -36,7 +41,14 @@ class todo
      * 存在するidならそのデータをプロパティ値で上書きする
      */
     public function save(){
-
+        /*todo:
+        $now_date = 現在時刻を取得
+        if($this->idのデータがある){
+            //レコードのlast_update_dateを$now_dateで、その他のデータをプロパティでうわがく。
+        }else{
+            //プロパティデータでレコードを追加する。createレコード追加時のidを$this->idに入れる。
+        }
+        */
         return true;
     }
 
@@ -44,7 +56,47 @@ class todo
      * $this->idのデータを削除する。
      */
     public function delete(){
-
+        /*todo:
+        if($this->idのデータがある){
+            //$this->idのレコードを削除する
+        }
+        */
         return true;
+    }
+
+    /*****getter setter****/
+    public function getId(){
+        return $this->id;
+    }
+    public function isDone(){
+        return $this->done;
+    }
+    public function getTitle(){
+        return $this->title;
+    }
+    public function getLimitData(){
+        return $this->limit_date;
+    }
+    public function getViewOrder(){
+        return $this->view_order;
+    }
+
+    public function setId($id){
+        $this->id = $id;
+    }
+    public function setDone(){
+        $this->done = true;
+    }
+    public function setUnDone(){
+        $this->done = false;
+    }
+    public function setTitle($title){
+        $this->title = $title;
+    }
+    public function setLimitData($limit_date){
+        $this->limit_date = $limit_date;
+    }
+    public function setViewOrder($view_order){
+        $this->view_order = $view_order;
     }
 }
