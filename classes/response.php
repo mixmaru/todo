@@ -18,6 +18,6 @@ class response
      * @param array $args テンプレート変数に渡す値の配列
      */
     public function render($template_path, array $args){
-
+        //html文字列を出力する
     }
 }

@@ -13,11 +13,26 @@ namespace classes;
 
 class request
 {
+    /**
+     * @return string
+     * リクエストメソッドタイプを返す
+     * get or post or delete or put
+     * 取得できなければfalseを返す
+     */
     public function getMethod(){
 
+        return "post";
     }
 
-    public function get(){
+    /**
+     * @param null $key
+     * @return string
+     * get値またはpost値から指定のkeyのデータを取得する。
+     * nullが渡された場合は、全ての値を配列にもたせて返す
+     * 値がなければfalseを返す
+     */
+    public function get($key = null){
 
+        return "値";
     }
 }

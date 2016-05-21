@@ -15,7 +15,11 @@ class todoList
 {
     private $models;
 
-    public function load(){
-
+    /**
+     * todoList constructor.
+     */
+    public function __construct()
+    {
+        $this->models = [new todo()];
     }
 }
