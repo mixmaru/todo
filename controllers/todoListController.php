@@ -49,9 +49,7 @@ class TodoListController
     /**
      * todoデータの変更
      */
-    public function actionUpdate(){
-        //todo: チェックonもこのアクションで行うか検討
-
+    public function actionEdit(){
         /*todo:
         $method = $request->getMethod();
         if($method === "get"){
@@ -75,11 +73,15 @@ class TodoListController
             try{
                 $todo_obj->save();
             }catch(Exeption $e){
+                $message = "データの変更に失敗しました";
                 //データ変更に失敗
-                $this->flash->set("データの変更に失敗しました");
+                $this->flash->set($message);
                 //ログへ記録
+                error_log($message);
             }
             //一覧へリダイレクト
+            header('Location: /');
+            exit();
         }else{
             //404
         }
@@ -87,10 +89,80 @@ class TodoListController
     }
 
     /**
+     * todoデータのチェックとアンチェックを行う。
+     * postのみ受け付ける
+     */
+    public function actionCheck(){
+        $method = $this->request->getMethod();
+        if($method !== "post"){
+            //404表示
+        }
+
+        //データ取得
+        $input_data = $this->request->post();
+
+        //バリデーション。入力を想定しているのは、int id(必須), 0 or 1 check(必須)
+        /*todo
+        if(バリデーションng){
+            //不正な値エラー
+        }
+
+        //指定idのtodoデータのdoneステータスを指定のものに更新する
+        if(指定idのtodoデータが存在しない){
+            //不正な値エラー
+        }
+        $todo_obj = new Todo($id);
+        try{
+            if($input_data['check']){
+                $todo_obj->setDone();
+            }else{
+                $todo_obj->setUnDone();
+            }
+        }catch(Exeption $e){
+            $message = "データの更新に失敗しました";
+            $this->flash->set($message);
+            //ログへ記録
+            error_log($message);
+            if(リファラがある){
+                //リファラへリダイレクト
+                header('Location: リファラ');
+            }//リファラがない場合は一覧へ。
+        }
+        //一覧へリダイレクト
+        header('Location: /');
+        exit();
+        */
+    }
+
+    /**
      * todoデータの削除
+     * postのみ受け付ける
      */
     public function actionDelete(){
+        $method = $this->request->getMethod();
+        if($method !== "post"){
+            //404表示
+        }
 
+        //データ取得
+        $input_data = $this->request->post();
+
+        //バリデーション。入力を想定しているのは、int id(必須)
+        /*todo
+        if(バリデーションng){
+            //不正な値エラー
+        }
+
+        $todo_obj = new Todo($data['id']);
+        if($todo->id !== null){
+            $todo->delete();
+        }
+
+        $this->flash->set("削除しました。");
+
+        //一覧へリダイレクト
+        header('Location: /');
+        exit();
     }
 
     private function render($template, $args = []){
