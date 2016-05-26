@@ -16,6 +16,7 @@
 
 use controllers;
 
+define("ROOT_PATH", dirname(__FILE__)."/");
 /*todo:
 //値の読み込み
 $controller_name = $_GET['controller'];

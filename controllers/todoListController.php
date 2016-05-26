@@ -44,6 +44,18 @@ class TodoListController
             'todo_data_list' => $todo_data_list,
         ]);
         */
+        if($this->request->getMethod() !== "get"){
+            echo "404";
+        }
+
+        //全てのtodoデータを取得する
+        $todo_list_obj = new TodoList();
+        $todo_data_list = $todo_list_obj->getDataArray();
+
+        //表示する
+        $this->render("list", [
+            'todo_data_list' => $todo_data_list,
+        ]);
     }
 
     /**
@@ -163,6 +175,7 @@ class TodoListController
         //一覧へリダイレクト
         header('Location: /');
         exit();
+        */
     }
 
     private function render($template, $args = []){

@@ -21,7 +21,7 @@ class Request
      */
     public function getMethod(){
 
-        return "post";
+        return "get";
     }
 
     /**
@@ -33,6 +33,10 @@ class Request
      */
     public function get($key = null){
 
+        return "値";
+    }
+
+    public function post($key = null){
         return "値";
     }
 }
