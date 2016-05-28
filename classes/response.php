@@ -14,6 +14,11 @@ namespace classes;
 class Response
 {
     const VIEW_ROOT_PATH = ROOT_PATH."templates/";
+
+    public function __construct()
+    {
+    }
+
     /**
      * @param $template_path テンプレートファイルのパス
      * @param array $args テンプレート変数に渡す値の配列
@@ -22,9 +27,9 @@ class Response
     public function render($template, array $args){
         //拡張子確認
         $file_info = new \SplFileInfo($template);
-        $extention = $file_info->getExtension();
-        if($extention === ""){
-            $template = $template."php";
+        $extension = $file_info->getExtension();
+        if($extension === ""){
+            $template = $template.".php";
         }
         $template_file_path = self::VIEW_ROOT_PATH.$template;
         extract($args);

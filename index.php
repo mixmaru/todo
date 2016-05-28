@@ -13,21 +13,33 @@
  * get値：controller コントローラー名
  * get値：action アクション名
  */
-
-use controllers;
-
 define("ROOT_PATH", dirname(__FILE__)."/");
-/*todo:
-//値の読み込み
-$controller_name = $_GET['controller'];
-$action_name = $_GET['action'];
+define("CONTROLLER_DIR_PATH", ROOT_PATH."controllers/");
 
-//対象コントローラーとアクションが存在するか確認
-if(controllerが存在しない または　actionが存在しない){
-    404の表示
+//オートロードの設定
+spl_autoload_register(function($name){
+    $name = str_replace("\\", DIRECTORY_SEPARATOR, $name);
+    include_once ROOT_PATH.$name.".php";
+});
+
+//値の読み込み
+$controller_name = $_GET['controller']."Controller";
+$action_name = "action".$_GET['action'];
+
+//指定されたコントローラーの存在確認
+try{
+    $controller_name = 'controllers\\'.$controller_name;
+    $controller = new $controller_name();
+}catch(Exception $e){
+    //指定コントローラーが存在しない。404エラー
+    var_dump("404");
 }
 
-//実行
-$controller = new $controller_name();
-$controller->"action".$action_name();
-*/
+
+if(method_exists($controller, $action_name)){
+    $controller->$action_name();
+}else{
+    //指定アクションが存在しない。404エラー
+    var_dump("404");
+}
+

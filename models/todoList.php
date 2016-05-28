@@ -10,6 +10,7 @@
 
 namespace models;
 
+use models\Todo;
 
 class TodoList
 {

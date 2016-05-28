@@ -11,7 +11,6 @@ namespace controllers;
 
 use classes\FlashMessage;
 use classes\Request;
-use models\Todo;
 use models\TodoList;
 use classes\Response;
 

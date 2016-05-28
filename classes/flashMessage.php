@@ -13,6 +13,10 @@ namespace classes;
 
 class FlashMessage
 {
+    public function __construct()
+    {
+    }
+
     /**
      * @param $message flashメッセージセット
      */

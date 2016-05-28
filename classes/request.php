@@ -13,6 +13,10 @@ namespace classes;
 
 class Request
 {
+    public function __construct()
+    {
+    }
+
     /**
      * @return string
      * リクエストメソッドタイプを返す
