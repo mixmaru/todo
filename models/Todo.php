@@ -10,6 +10,8 @@
 
 namespace models;
 
+use classes\Config;
+
 class Todo
 {
     private $id;
@@ -20,6 +22,9 @@ class Todo
     private $created;
     private $modified;
 
+    private $pdo;
+    const TABLE_NAME = "todo";
+
     /**
      * todo constructor.
      * @param null $id
@@ -27,12 +32,29 @@ class Todo
      * なければ、すべてnullのデータをインスタンス化する
      */
     public function __construct($id = null){
-        /*todo:
-        //いちどだけDB接続を実行する
+        //todo:シングルトンにする
+        $config = new Config();
+        $config_params = $config->getConfig();
+        $db_params = $config_params['db'];
+        $this->pdo = new \PDO("mysql:host=".$db_params['host'].";dbname=".$db_params['db'], $db_params['user'], $db_params['password']);
         if($id !== null){
-            //データをロードする
+            $sql = "SELECT id, is_done, title, limit_date, view_order, created, modified ";
+            $sql .= "FROM ".self::TABLE_NAME." ";
+            $sql .= "WHERE id = :id ";
+            $stmt = $this->pdo->prepare($sql);
+            if($stmt->execute(['id' => $id])){
+                $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if($result !== false){
+                    $this->id           = (int) $result['id'];
+                    $this->is_done      = (int) $result['is_done'];
+                    $this->title        = $result['title'];
+                    $this->limit_date   = $result['limit_date'];
+                    $this->view_order   = (int) $result['view_order'];
+                    $this->created      = $result['created'];
+                    $this->modified     = $result['modified'];
+                }
+            }
         }
-        */
     }
 
     /**
