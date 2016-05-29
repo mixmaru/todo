@@ -13,12 +13,12 @@ namespace models;
 class Todo
 {
     private $id;
-    private $done;
+    private $is_done;
     private $title;
     private $limit_date;
     private $view_order;
-    private $create_date;
-    private $last_update_date;
+    private $created;
+    private $modified;
 
     /**
      * todo constructor.
@@ -69,7 +69,7 @@ class Todo
         return $this->id;
     }
     public function isDone(){
-        return $this->done;
+        return $this->is_done;
     }
     public function getTitle(){
         return $this->title;
@@ -85,10 +85,10 @@ class Todo
         $this->id = $id;
     }
     public function setDone(){
-        $this->done = true;
+        $this->is_done = true;
     }
     public function setUnDone(){
-        $this->done = false;
+        $this->is_done = false;
     }
     public function setTitle($title){
         $this->title = $title;
