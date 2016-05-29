@@ -15,6 +15,9 @@
  */
 define("ROOT_PATH", dirname(__FILE__)."/");
 define("CONTROLLER_DIR_PATH", ROOT_PATH."controllers/");
+define("MODEL_DIR_PATH", ROOT_PATH."models/");
+define("TEMPLATE_DIR_PATH", ROOT_PATH."templates/");
+define("CONFIG_DIR_PATH", ROOT_PATH."config/");
 
 //オートロードの設定
 spl_autoload_register(function($name){
