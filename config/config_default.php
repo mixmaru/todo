@@ -12,7 +12,7 @@ $db = [
     'host' => "host_name",
     'user' => "user_name",
     'password' => "password",
-    'db_name' => "db_name",
+    'db' => "db_name",
 ];
 
 return [
