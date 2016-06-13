@@ -66,14 +66,48 @@ class Todo
      * 存在するidならそのデータをプロパティ値で上書きする
      */
     public function save(){
-        /*todo:
-        $now_date = 現在時刻を取得
-        if($this->idのデータがある){
-            //レコードのlast_update_dateを$now_dateで、その他のデータをプロパティでうわがく。
+        $now_data = date("Y-m-d H:i:s");
+        $this->modified = $now_data;
+        $record_exist = $this->isExist($this->id);
+        if($record_exist){
+            //更新
+            $sql = "UPDATE ".self::TABLE_NAME." SET  is_done = :is_done, title = :title, limit_date = :limit_date, view_order = :view_order, modified = :modified ";
+            $sql .= "WHERE id = :id";
+            $params = [
+                ':id' => $this->id,
+                ':is_done' => $this->is_done,
+                ':title' => $this->title,
+                ':limit_date' => $this->limit_date,
+                ':view_order'=> $this->view_order,
+                ':modified' => $this->modified,
+            ];
+
         }else{
-            //プロパティデータでレコードを追加する。createレコード追加時のidを$this->idに入れる。
+            //新規登録
+            $this->created = $now_data;
+            $sql = "INSERT INTO ".self::TABLE_NAME." (id, is_done, title, limit_date, view_order, created, modified) ";
+            $sql .= "VALUES (:id, :is_done, :title, :limit_date, :view_order, :created, :modified) ";
+            $params = [
+                ':id' => $this->id,
+                ':is_done' => $this->is_done,
+                ':title' => $this->title,
+                ':limit_date' => $this->limit_date,
+                ':view_order'=> $this->view_order,
+                ':created' => $this->created,
+                ':modified' => $this->modified,
+            ];
+
         }
-        */
+        self::$pdo->beginTransaction();
+        $stmt = self::$pdo->prepare($sql);
+        if(!$stmt->execute($params)){
+            throw new \Exception("データ更新に失敗しました");
+        }
+        if(!$record_exist){
+            //レコード追加時のidを$this->idに入れる。
+            $this->id = self::$pdo->lastInsertId();
+        }
+        self::$pdo->commit();
         return true;
     }
 
@@ -86,6 +120,15 @@ class Todo
             //$this->idのレコードを削除する
         }
         */
+        return true;
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     * $idのレコードがあるかどうかを確認
+     */
+    public function isExist($id){
         return true;
     }
 
