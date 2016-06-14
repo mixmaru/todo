@@ -128,8 +128,21 @@ class Todo
      * @return bool
      * $idのレコードがあるかどうかを確認
      */
-    public function isExist($id){
-        return true;
+    static public function isExist($id){
+        $obj = new Todo();//self::$pdoを初期化するための捨てオブジェクト
+
+        $sql = "SELECT id FROM ".self::TABLE_NAME." WHERE id = :id LIMIT 1";
+        $params = ['id' => $id];
+        $stmt = self::$pdo->prepare($sql);
+        if(!$stmt->execute($params)){
+            throw new \Exception("データ取得に失敗しました");
+        }
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if($result !== false && count($result) > 0){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /*****getter setter****/
