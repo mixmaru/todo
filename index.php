@@ -12,6 +12,8 @@
  * ※とりあえず、今はget値で実行するコントローラーとアクションを指定する。
  * get値：controller コントローラー名
  * get値：action アクション名
+ * 例：/?controller=hoge&action=huga
+ *　　　上記はhogeController->actionhugaが実行される
  */
 define("ROOT_PATH", dirname(__FILE__)."/");
 define("CONTROLLER_DIR_PATH", ROOT_PATH."controllers/");
