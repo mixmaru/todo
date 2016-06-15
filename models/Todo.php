@@ -113,20 +113,42 @@ class Todo
 
     /**
      * $this->idのデータを削除する。
+     * @return bool
+     * @throws \Exception
      */
     public function delete(){
-        /*todo:
-        if($this->idのデータがある){
+        if(!is_null($this->id) && $this->isExist($this->id)){
             //$this->idのレコードを削除する
+            $sql = "DELETE FROM ".self::TABLE_NAME." WHERE id = :id";
+            $params = ['id' => $this->id];
+            $stmt = self::$pdo->prepare($sql);
+            if(!$stmt->execute($params)){
+                throw new \Exception("データ取得に失敗しました");
+            }
+            $this->clear();
+            return true;
         }
-        */
-        return true;
+        return false;
+    }
+
+    /**
+     * プロパティをnullにする(self::$pdoを除く)
+     */
+    public function clear(){
+        $reflect_obj = new \ReflectionClass($this);
+        $props = $reflect_obj->getProperties();
+        foreach($props as $prop){
+            if($prop->name != "pdo"){
+                $prop_name = $prop->name;
+                $this->$prop_name = null;
+            }
+        }
     }
 
     /**
      * @param $id
-     * @return bool
-     * $idのレコードがあるかどうかを確認
+     * @return bool $idのレコードがあるかどうかを確認
+     * @throws \Exception
      */
     static public function isExist($id){
         $obj = new Todo();//self::$pdoを初期化するための捨てオブジェクト
