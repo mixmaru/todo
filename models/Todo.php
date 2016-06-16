@@ -61,6 +61,41 @@ class Todo
     }
 
     /**
+     * 全てのTodoを表示する順に取得する
+     * @return array
+     * @throws \Exception
+     */
+    static public function getAllTodo(){
+        $obj = new Todo;//捨てオブジェクト
+
+        $ret_array = [];
+
+        $sql = "SELECT id, is_done, title, limit_date, view_order, created, modified ";
+        $sql .= "FROM ".self::TABLE_NAME." ";
+        $sql .= "ORDER BY limit_date ASC, view_order ASC";
+        $stmt = self::$pdo->prepare($sql);
+        if(!$stmt->execute()){
+            throw new \Exception("データ取得に失敗しました");
+        }
+        $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        if($records === false){
+            throw new \Exception("データ取得に失敗しました");
+        }
+        foreach($records as $record){
+            $todo_obj = new Todo();
+            $todo_obj->id           = (int) $record['id'];
+            $todo_obj->is_done      = (int) $record['is_done'];
+            $todo_obj->title        = $record['title'];
+            $todo_obj->limit_date   = $record['limit_date'];
+            $todo_obj->view_order   = (int) $record['view_order'];
+            $todo_obj->created      = $record['created'];
+            $todo_obj->modified     = $record['modified'];
+            $ret_array[] = $todo_obj;
+        }
+        return $ret_array;
+    }
+
+    /**
      * プロパティのデータを永続化する。
      * $this->idがnullもしくは、存在しないidなら新規登録する。
      * 存在するidならそのデータをプロパティ値で上書きする
