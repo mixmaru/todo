@@ -11,7 +11,7 @@ namespace controllers;
 
 use classes\FlashMessage;
 use classes\Request;
-use models\TodoList;
+use models\Todo;
 use classes\Response;
 
 class TodoListController
@@ -48,8 +48,7 @@ class TodoListController
         }
 
         //全てのtodoデータを取得する
-        $todo_list_obj = new TodoList();
-        $todo_data_list = $todo_list_obj->getDataArray();
+        $todo_data_list = Todo::getAllTodo(false);
 
         //表示する
         $this->render("list", [
