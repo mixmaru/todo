@@ -62,10 +62,11 @@ class Todo
 
     /**
      * 全てのTodoを表示する順に取得する
+     * @param bool $byObject true:オブジェクトで取得 false:配列で取得
      * @return array
      * @throws \Exception
      */
-    static public function getAllTodo(){
+    static public function getAllTodo($byObject = true){
         $obj = new Todo;//捨てオブジェクト
 
         $ret_array = [];
@@ -82,15 +83,27 @@ class Todo
             throw new \Exception("データ取得に失敗しました");
         }
         foreach($records as $record){
-            $todo_obj = new Todo();
-            $todo_obj->id           = (int) $record['id'];
-            $todo_obj->is_done      = (int) $record['is_done'];
-            $todo_obj->title        = $record['title'];
-            $todo_obj->limit_date   = $record['limit_date'];
-            $todo_obj->view_order   = (int) $record['view_order'];
-            $todo_obj->created      = $record['created'];
-            $todo_obj->modified     = $record['modified'];
-            $ret_array[] = $todo_obj;
+            if($byObject){
+                $todo_obj = new Todo();
+                $todo_obj->id           = (int) $record['id'];
+                $todo_obj->is_done      = (int) $record['is_done'];
+                $todo_obj->title        = $record['title'];
+                $todo_obj->limit_date   = $record['limit_date'];
+                $todo_obj->view_order   = (int) $record['view_order'];
+                $todo_obj->created      = $record['created'];
+                $todo_obj->modified     = $record['modified'];
+                $ret_array[] = $todo_obj;
+            }else{
+                $ret_array[] = [
+                    'id'            => (int) $record['id'],
+                    'is_done'       => (int) $record['is_done'],
+                    'title'         => $record['title'],
+                    'limit_date'    => $record['limit_date'],
+                    'view_order'    => (int) $record['view_order'],
+                    'created'       => $record['created'],
+                    'modified'      => $record['modified'],
+                ];
+            }
         }
         return $ret_array;
     }
