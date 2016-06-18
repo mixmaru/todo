@@ -18,7 +18,9 @@
 define("ROOT_PATH", dirname(__FILE__)."/");
 define("CONTROLLER_DIR_PATH", ROOT_PATH."controllers/");
 define("MODEL_DIR_PATH", ROOT_PATH."models/");
-define("TEMPLATE_DIR_PATH", ROOT_PATH."templates/");
+define("VIEW_DIR_PATH", ROOT_PATH."views/");
+define("TEMPLATE_DIR_PATH", VIEW_DIR_PATH."templates/");
+define("VIEW_CACHE_DIR_PATH", VIEW_DIR_PATH."cache/");
 define("CONFIG_DIR_PATH", ROOT_PATH."config/");
 
 //オートロードの設定
@@ -26,6 +28,9 @@ spl_autoload_register(function($name){
     $name = str_replace("\\", DIRECTORY_SEPARATOR, $name);
     include_once ROOT_PATH.$name.".php";
 });
+
+//composer用のオートロード
+require_once ROOT_PATH."vendor/autoload.php";
 
 //値の読み込み
 $controller_name = $_GET['controller']."Controller";

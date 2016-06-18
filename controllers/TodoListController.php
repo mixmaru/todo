@@ -12,16 +12,25 @@ namespace controllers;
 use classes\FlashMessage;
 use classes\Request;
 use models\Todo;
-use classes\Response;
+//use classes\Response;
 
 class TodoListController
 {
     private $request;
+//    private $responce;
+    private $renderer;  //レンダラー。テンプレートエンジンオブジェクトを格納する
     public function __construct()
     {
         $this->request = new Request();
-        $this->responce = new Response();
+//        $this->responce = new Response();
         $this->flash = new FlashMessage();
+        $loader = new \Twig_Loader_Filesystem(TEMPLATE_DIR_PATH);
+        $this->renderer = new \Twig_Environment($loader, [
+//            'cache' => VIEW_CACHE_DIR_PATH,//todo:キャッシュが書き込めない
+            'charset' => 'utf-8',
+            'auto_reload' => true,
+        //	'autoescape' => false,
+        ]);
     }
 
     /**
@@ -51,7 +60,7 @@ class TodoListController
         $todo_data_list = Todo::getAllTodo(false);
 
         //表示する
-        $this->render("list", [
+        $this->render("list.html", [
             'todo_data_list' => $todo_data_list,
         ]);
     }
@@ -177,6 +186,6 @@ class TodoListController
     }
 
     private function render($template, $args = []){
-        $this->responce->render($template, $args);
+        echo $this->renderer->render($template, $args);
     }
 }
