@@ -56,6 +56,8 @@ class TodoListController
         */
         if($this->request->getMethod() !== "get"){
             echo "404";
+            //404を表示する
+            exit();
         }
 
         //全てのtodoデータを取得する

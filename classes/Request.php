@@ -24,8 +24,12 @@ class Request
      * 取得できなければfalseを返す
      */
     public function getMethod(){
+        $ret_method = false;
+        if(isset($_SERVER["REQUEST_METHOD"])){
+            $ret_method = mb_strtolower($_SERVER["REQUEST_METHOD"]);
+        }
 
-        return "get";
+        return $ret_method;
     }
 
     /**
