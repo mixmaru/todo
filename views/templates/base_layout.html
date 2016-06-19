@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{page_title}}</title>
+    {% block css %}
+        <link rel="stylesheet" type="text/css" href="/css/common.css">
+    {% endblock %}
+    {% block js %}
+        {#<script type="text/javascript" src="/js/common.js"></script>#}
+    {% endblock %}
+</head>
+<body>
+{% block content %}{% endblock %}
+</body>
+</html>

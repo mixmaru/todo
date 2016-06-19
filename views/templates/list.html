@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    テスト表示
-</body>
-</html>
+{% extends "base_layout.html" %}
+
+{% block content %}
+
+    {% if todo_data_list|length > 0 %}
+    <ul>
+        {% for todo in todo_data_list %}
+        <li>{{todo.title}}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>todoはありません</p>
+    {% endif %}
+{% endblock %}

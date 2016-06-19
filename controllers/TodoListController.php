@@ -26,11 +26,13 @@ class TodoListController
         $this->flash = new FlashMessage();
         $loader = new \Twig_Loader_Filesystem(TEMPLATE_DIR_PATH);
         $this->renderer = new \Twig_Environment($loader, [
-//            'cache' => VIEW_CACHE_DIR_PATH,//todo:キャッシュが書き込めない
-            'charset' => 'utf-8',
-            'auto_reload' => true,
-        //	'autoescape' => false,
+            'debug'         => true,//todo:本番ではfalseにする
+            'cache'         => VIEW_CACHE_DIR_PATH,//todo:キャッシュが書き込めない
+            'charset'       => 'utf-8',
+//            'auto_reload'   => true,
+//        	'autoescape'    => false,
         ]);
+        $this->renderer->addExtension(new \Twig_Extension_Debug());
     }
 
     /**
@@ -61,6 +63,7 @@ class TodoListController
 
         //表示する
         $this->render("list.html", [
+            'page_title' => "todoリスト",
             'todo_data_list' => $todo_data_list,
         ]);
     }
