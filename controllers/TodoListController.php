@@ -39,21 +39,6 @@ class TodoListController
      * todo一覧表示
      */
     public function actionList(){
-        /*todo:
-
-        if($this->request->getMethod() !== "get"){
-            //404を表示
-        }
-
-        //全てのtodoデータを取得する
-        $todo_list_obj = new TodoList();
-        $todo_data_list = $todo_list_obj->getDataArray();
-
-        //表示する
-        $this->render("", [
-            'todo_data_list' => $todo_data_list,
-        ]);
-        */
         if($this->request->getMethod() !== "get"){
             echo "404";
             //404を表示する
