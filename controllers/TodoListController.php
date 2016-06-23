@@ -12,27 +12,17 @@ namespace controllers;
 use classes\FlashMessage;
 use classes\Request;
 use models\Todo;
-//use classes\Response;
+use classes\View;
 
 class TodoListController
 {
     private $request;
-//    private $responce;
     private $renderer;  //レンダラー。テンプレートエンジンオブジェクトを格納する
     public function __construct()
     {
         $this->request = new Request();
-//        $this->responce = new Response();
         $this->flash = new FlashMessage();
-        $loader = new \Twig_Loader_Filesystem(TEMPLATE_DIR_PATH);
-        $this->renderer = new \Twig_Environment($loader, [
-            'debug'         => true,//todo:本番ではfalseにする
-            'cache'         => VIEW_CACHE_DIR_PATH,//todo:キャッシュが書き込めない
-            'charset'       => 'utf-8',
-//            'auto_reload'   => true,
-//        	'autoescape'    => false,
-        ]);
-        $this->renderer->addExtension(new \Twig_Extension_Debug());
+        $this->renderer = new View();
     }
 
     /**
@@ -40,8 +30,8 @@ class TodoListController
      */
     public function actionList(){
         if($this->request->getMethod() !== "get"){
-            echo "404";
             //404を表示する
+            $this->renderer->renderError(404);
             exit();
         }
 
@@ -49,7 +39,7 @@ class TodoListController
         $todo_data_list = Todo::getAllTodo(false);
 
         //表示する
-        $this->render("list.html", [
+        $this->renderer->render("list", [
             'page_title' => "todoリスト",
             'todo_data_list' => $todo_data_list,
         ]);
@@ -175,7 +165,10 @@ class TodoListController
         */
     }
 
-    private function render($template, $args = []){
-        echo $this->renderer->render($template, $args);
+    /**
+     * テスト用メソッド
+     */
+    public function actionTest(){
+        $this->renderer->renderError(404);
     }
 }
