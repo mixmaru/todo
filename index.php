@@ -1,4 +1,5 @@
 <?php
+use classes\View;
 /**
  * Created by IntelliJ IDEA.
  * User: mix
@@ -26,7 +27,12 @@ define("CONFIG_DIR_PATH", ROOT_PATH."config/");
 //オートロードの設定
 spl_autoload_register(function($name){
     $name = str_replace("\\", DIRECTORY_SEPARATOR, $name);
-    include_once ROOT_PATH.$name.".php";
+    $file = $name.".php";
+    if(file_exists($file)){
+        include_once ROOT_PATH.$name.".php";
+    }else{
+        throw new Exception("クラスファイルが存在しません");
+    }
 });
 
 //composer用のオートロード
@@ -42,7 +48,9 @@ try{
     $controller = new $controller_name();
 }catch(Exception $e){
     //指定コントローラーが存在しない。404エラー
-    var_dump("404");
+    $view = new View();
+    $view->renderError(404);
+    exit();
 }
 
 
@@ -50,6 +58,8 @@ if(method_exists($controller, $action_name)){
     $controller->$action_name();
 }else{
     //指定アクションが存在しない。404エラー
-    var_dump("404");
+    $view = new View();
+    $view->renderError(404);
+    exit();
 }
 
