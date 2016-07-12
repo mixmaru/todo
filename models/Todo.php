@@ -10,21 +10,23 @@
 
 namespace models;
 
-use classes\Config;
 
-class Todo
+
+class Todo extends BaseModel
 {
     private $id;
-    private $is_done;
     private $title;
+    private $do_date;
     private $limit_date;
-    private $view_order;
+    private $is_done;
+    private $path;
+    private $project_id;
+    private $user_id;
     private $created;
     private $modified;
 
     const TABLE_NAME = "todo";
 
-    static private $pdo;
 
     /**
      * todo constructor.
@@ -33,26 +35,23 @@ class Todo
      * なければ、すべてnullのデータをインスタンス化する
      */
     public function __construct($id = null){
-        //pdo接続はインスタンス間で使い回す
-        if(is_null(self::$pdo)){
-            $config = new Config();
-            $config_params = $config->getConfig();
-            $db_params = $config_params['db'];
-            self::$pdo = new \PDO("mysql:host=".$db_params['host'].";dbname=".$db_params['db'], $db_params['user'], $db_params['password']);
-        }
+        parent::__construct();
         if($id !== null){
-            $sql = "SELECT id, is_done, title, limit_date, view_order, created, modified ";
+            $sql = "SELECT id, title, do_date, limit_date, is_done, path, project_id, user_id, created, modified ";
             $sql .= "FROM ".self::TABLE_NAME." ";
             $sql .= "WHERE id = :id ";
-            $stmt = self::$pdo->prepare($sql);
+            $stmt = $this->db->prepare($sql);
             if($stmt->execute(['id' => $id])){
                 $result = $stmt->fetch(\PDO::FETCH_ASSOC);
                 if($result !== false){
                     $this->id           = (int) $result['id'];
-                    $this->is_done      = (int) $result['is_done'];
                     $this->title        = $result['title'];
+                    $this->do_date        = $result['do_date'];
                     $this->limit_date   = $result['limit_date'];
-                    $this->view_order   = (int) $result['view_order'];
+                    $this->is_done      = $result['is_done'];
+                    $this->path      = $result['path'];
+                    $this->project_id   = (int) $result['project_id'];
+                    $this->user_id   = (int) $result['user_id'];
                     $this->created      = $result['created'];
                     $this->modified     = $result['modified'];
                 }
