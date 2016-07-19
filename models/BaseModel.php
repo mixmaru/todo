@@ -14,6 +14,10 @@ class BaseModel{
 
     protected $db;
 
+    protected $id;
+    protected $created;
+    protected $modified;
+
     public function __construct()
     {
         //pdo接続はインスタンス間で使い回す
@@ -24,6 +28,21 @@ class BaseModel{
             self::$pdo = new \PDO("mysql:host=".$db_params['host'].";dbname=".$db_params['db'], $db_params['user'], $db_params['password']);
         }
         $this->db = self::$pdo;
+    }
+
+    public function getId(){
+        return $this->id;
+    }
+    public function setId($id){
+        $this->id = $id;
+    }
+
+    public function getCreated(){
+        return $this->created;
+    }
+
+    public function getModified(){
+        return $this->modified;
     }
 
 }

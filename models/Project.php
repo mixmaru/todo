@@ -14,6 +14,7 @@ class Project extends BaseModel{
     public function __construct($id)
     {
         parent::__construct();
+        $this->id = $id;
         /*todo:
         $idでプロジェクトテーブルからデータを取得してプロパティにセットする
         */

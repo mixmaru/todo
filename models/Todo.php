@@ -14,16 +14,16 @@ namespace models;
 
 class Todo extends BaseModel
 {
-    private $id;
     private $title;
     private $do_date;
     private $limit_date;
     private $is_done;
     private $path;
+    private $depth;
     private $project_id;
     private $user_id;
-    private $created;
-    private $modified;
+
+
 
     const TABLE_NAME = "todo";
 
@@ -37,7 +37,7 @@ class Todo extends BaseModel
     public function __construct($id = null){
         parent::__construct();
         if($id !== null){
-            $sql = "SELECT id, title, do_date, limit_date, is_done, path, project_id, user_id, created, modified ";
+            $sql = "SELECT id, title, do_date, limit_date, is_done, path, depth, project_id, user_id, created, modified ";
             $sql .= "FROM ".self::TABLE_NAME." ";
             $sql .= "WHERE id = :id ";
             $stmt = $this->db->prepare($sql);
@@ -50,6 +50,7 @@ class Todo extends BaseModel
                     $this->limit_date   = $result['limit_date'];
                     $this->is_done      = $result['is_done'];
                     $this->path      = $result['path'];
+                    $this->depth      = (int) $result['depth'];
                     $this->project_id   = (int) $result['project_id'];
                     $this->user_id   = (int) $result['user_id'];
                     $this->created      = $result['created'];
@@ -105,6 +106,54 @@ class Todo extends BaseModel
             }
         }
         return $ret_array;
+    }
+
+    static public function getTodoListByProject($project_id, $object = true){
+        new Todo;
+        $sql = "SELECT id, title, do_date, limit_date, is_done, path, project_id, user_id, created, modified "
+              ."FROM `todo` "
+              ."WHERE project_id = :project_id "
+              ."ORDER BY (LENGTH(path) - LENGTH(REPLACE(path, '/', '')) -1)";
+        $stmt = self::$pdo->prepare($sql);
+        if(!$stmt->execute([':project_id' => $project_id])){
+            throw new \Exception("データ取得に失敗しました");
+        }
+        $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $ret_tree_data = [];//返却用Tree構造データ
+        $tmp_list_data = [];//Treeデータ作成に必要なlistデータ
+        foreach($records as $todo_data){
+            if($object){
+                $node = new Todo();
+                $node->setId($todo_data['id']);
+                $node->setTitle($todo_data['title']);
+                $node->setDoDate($todo_data['do_date']);
+                $node->setLimitData($todo_data['limit_date']);
+                $node->is_done = $todo_data['is_done'];
+                $node->setPath($todo_data['path']);
+                $node->setProjectId($todo_data['project_id']);
+                $node->setUserId($todo_data['user_id']);
+                $node->created = $todo_data['created'];
+                $node->modified = $todo_data['modified'];
+            }else{
+                $node = $todo_data;
+            }
+            $path_array = array_filter(explode('/', $todo_data['path']), 'strlen');
+            $current_id = array_pop($path_array);
+            $parent_id = array_pop($path_array);
+            $tmp_list_data[$current_id] = [
+                'data' => $node,
+                'child' => [],
+//                'parent' => null,
+            ];
+            if(is_null($parent_id)){
+                $ret_tree_data[$current_id] = &$tmp_list_data[$current_id];
+            }else{
+//                $tmp_list_data[$current_id]['parent'] = &$tmp_list_data[$parent_id];
+                $tmp_list_data[$parent_id]['child'][$current_id] = &$tmp_list_data[$current_id];
+            }
+        }
+        return $ret_tree_data;
     }
 
     /**
@@ -214,26 +263,56 @@ class Todo extends BaseModel
         }
     }
 
-    /*****getter setter****/
-    public function getId(){
-        return $this->id;
+    /**
+     * プロパティデータを配列として取得
+     * @param bool $assciate :関連モデルのデータも一緒にとってくるかどうか
+     * @return array
+     */
+    public function getDataArray(){
+        $ret_array = [
+            'id' => $this->getId(),
+            'do_date' => $this->getDoData(),
+            'limit_date' => $this->getLimitData(),
+            'is_done' => $this->isDone(),
+            'path' => $this->getPath(),
+            'depth' => $this->getDepth(),
+            'project_id' => $this->getProjectId(),
+            'user_id' => $this->getId(),
+            'created' => $this->getCreated(),
+            'modified' => $this->getModified(),
+        ];
+        return $ret_array;
     }
+
+    /*****getter setter****/
     public function isDone(){
         return $this->is_done;
     }
     public function getTitle(){
         return $this->title;
     }
+    public function getDoData(){
+        return $this->do_date;
+    }
     public function getLimitData(){
         return $this->limit_date;
+    }
+    public function getPath(){
+        return $this->path;
+    }
+    public function getDepth(){
+        return $this->depth;
+    }
+    public function getProjectId(){
+        return $this->project_id;
+    }
+    public function getUserId(){
+        return $this->user_id;
     }
     public function getViewOrder(){
         return $this->view_order;
     }
 
-    public function setId($id){
-        $this->id = $id;
-    }
     public function setDone(){
         $this->is_done = true;
     }
@@ -243,8 +322,23 @@ class Todo extends BaseModel
     public function setTitle($title){
         $this->title = $title;
     }
+    public function setDoDate($do_date){
+        $this->do_date = $do_date;
+    }
     public function setLimitData($limit_date){
         $this->limit_date = $limit_date;
+    }
+    public function setIsDone($is_done){
+        $this->is_done = $is_done;
+    }
+    public function setPath($path){
+        $this->path = $path;
+    }
+    public function setProjectId($project_id){
+        $this->project_id = $project_id;
+    }
+    public function setUserId($user_id){
+        $this->user_id = $user_id;
     }
     public function setViewOrder($view_order){
         $this->view_order = $view_order;
