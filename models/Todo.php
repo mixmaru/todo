@@ -239,6 +239,119 @@ class Todo extends BaseModel
         return $ret_tree_data;
     }
 
+    private static function makeListTodoData($records){
+        $ret_array = [];
+        foreach($records as $todo_data){
+            $ret_array[] =  [
+                'id'            => (int) $todo_data['id'],
+                'title'         => $todo_data['title'],
+                'do_date'       => $todo_data['do_date'],
+                'limit_date'    => $todo_data['limit_date'],
+                'is_done'       => $todo_data['is_done'],
+                'path'          => $todo_data['path'],
+                'project_id'    => (int) $todo_data['project_id'],
+                'user_id'       => (int) $todo_data['user_id'],
+                'created'       => $todo_data['created'],
+                'modified'      => $todo_data['modified'],
+            ];
+        }
+        return $ret_array;
+    }
+
+    /**
+     * 日毎Todoリスト表示用メソッド。
+     * todo: sql文をgetTodoListByUserと共通化できる
+     * todo: プロジェクトデータをセットする部分を共通化する
+     *
+     * @param $user_id
+     * @param $start_date :日にちを指定。$limitを指定しない場合はこの日のTodoリストが返る
+     * @param null $limit_date :日にちを指定。$start_dateから$limit_dateの間で絞り込んだTodoリストが返る
+     * @return array
+     * @throws \Exception
+     */
+    public static function getTodoListByDay($user_id, $start_date, $limit_date = null){
+        new Todo();
+        $sql = "SELECT
+                    td.id,
+                    td.title,
+                    td.do_date,
+                    td.limit_date,
+                    td.is_done,
+                    td.path,
+                    td.project_id,
+                    td.user_id,
+                    td.created,
+                    td.modified,
+                    pj.id as pj_id,
+                    pj.name as pj_name,
+                    pj.view_order as pj_view_order,
+                    pj.user_id as pj_user_id,
+                    pj.created as pj_created,
+                    pj.modified as pj_modified
+                FROM todo td
+                    INNER JOIN project pj ON pj.id = td.project_id
+                WHERE td.user_id = :user_id
+                AND td.do_date BETWEEN :start_date AND :limit_date
+                OR td.limit_date BETWEEN :start_date AND :limit_date
+                ORDER BY pj.view_order ASC, (LENGTH(path) - LENGTH(REPLACE(path, '/', '')) - 1) ASC";
+        $params = [
+            ':user_id' => $user_id,
+            ':start_date' => $start_date,
+            ':limit_date' => $limit_date,
+        ];
+        $stmt = self::$pdo->prepare($sql);
+        if(!$stmt->execute($params)){
+            throw new \Exception("データ取得に失敗しました");
+        }
+        $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        if(count($records) == 0){
+            return [];
+        }
+
+        $ret_data = [];
+        $count = 0;
+        $tmp_project_id = $records[0]['project_id'];
+        $tmp_records = [];
+        foreach($records as $record){
+            if($tmp_project_id != $record['project_id']){
+                //１プロジェクト分のデータを作成して次の処理へ進む
+                $project_data = [
+                    'id'            => (int) $tmp_records[0]['pj_id'],
+                    'name'          => $tmp_records[0]['pj_name'],
+                    'view_order'    => $tmp_records[0]['pj_view_order'],
+                    'user_id'       => $tmp_records[0]['pj_user_id'],
+                    'created'       => $tmp_records[0]['pj_created'],
+                    'modified'      => $tmp_records[0]['pj_modified'],
+                ];
+                $ret_data[$count] = [
+                    'project_data' => $project_data,
+                    'todo_data' => self::makeListTodoData($tmp_records),
+                ];
+                //次の処理のための処理
+                $tmp_records = [];
+                $tmp_project_id = $record['project_id'];
+                $count++;
+            }
+            $tmp_records[] = $record;
+        }
+        if(count($tmp_records) > 0){
+            $project_data = [
+                'id'            => (int) $tmp_records[0]['pj_id'],
+                'name'          => $tmp_records[0]['pj_name'],
+                'view_order'    => $tmp_records[0]['pj_view_order'],
+                'user_id'       => $tmp_records[0]['pj_user_id'],
+                'created'       => $tmp_records[0]['pj_created'],
+                'modified'      => $tmp_records[0]['pj_modified'],
+            ];
+            $ret_data[$count] = [
+                'project_data' => $project_data,
+                'todo_data' => self::makeListTodoData($tmp_records),
+            ];
+        }
+
+        return $ret_data;
+    }
+
     /**
      * プロパティのデータを永続化する。
      * $this->idがnullもしくは、存在しないidなら新規登録する。
