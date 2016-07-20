@@ -120,6 +120,13 @@ class Todo extends BaseModel
         }
         $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+
+    /**
+     * @param $records       :同一プロジェクトの深さ順にならんだレコード配列
+     * @param bool $object  :objectで取得するかどうか
+     * @return array
+     */
+    private static function makeTreeData($records, $object = true){
         $ret_tree_data = [];//返却用Tree構造データ
         $tmp_list_data = [];//Treeデータ作成に必要なlistデータ
         foreach($records as $todo_data){
