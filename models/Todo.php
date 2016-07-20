@@ -138,7 +138,6 @@ class Todo extends BaseModel
      * ];
      *
      * @param $user_id
-     * @param bool $object
      * @return array
      * @throws \Exception
      */
@@ -176,7 +175,7 @@ class Todo extends BaseModel
                 ];
                 $ret_data[$count] = [
                     'project_data' => $project_data,
-                    'todo_data' => self::makeTreeData($tmp_records, false),
+                    'todo_data' => self::makeTreeData($tmp_records),
                 ];
                 //次の処理のための処理
                 $tmp_records = [];
@@ -196,7 +195,7 @@ class Todo extends BaseModel
             ];
             $ret_data[$count] = [
                 'project_data' => $project_data,
-                'todo_data' => self::makeTreeData($tmp_records, false),
+                'todo_data' => self::makeTreeData($tmp_records),
             ];
         }
         return $ret_data;
@@ -204,34 +203,29 @@ class Todo extends BaseModel
 
 
     /**
-     * @param $records       :同一プロジェクトの深さ順にならんだレコード配列
-     * @param bool $object  :objectで取得するかどうか
+     * @param $records       :同一プロジェクトの深さ順にならんだTodoレコード配列
      * @return array
      */
-    private static function makeTreeData($records, $object = true){
+    private static function makeTreeData($records){
         $ret_tree_data = [];//返却用Tree構造データ
         $tmp_list_data = [];//Treeデータ作成に必要なlistデータ
         foreach($records as $todo_data){
-            if($object){
-                $node = new Todo();
-                $node->setId($todo_data['id']);
-                $node->setTitle($todo_data['title']);
-                $node->setDoDate($todo_data['do_date']);
-                $node->setLimitData($todo_data['limit_date']);
-                $node->is_done = $todo_data['is_done'];
-                $node->setPath($todo_data['path']);
-                $node->setProjectId($todo_data['project_id']);
-                $node->setUserId($todo_data['user_id']);
-                $node->created = $todo_data['created'];
-                $node->modified = $todo_data['modified'];
-            }else{
-                $node = $todo_data;
-            }
             $path_array = array_filter(explode('/', $todo_data['path']), 'strlen');
             $current_id = array_pop($path_array);
             $parent_id = array_pop($path_array);
             $tmp_list_data[$current_id] = [
-                'data' => $node,
+                'data' => [
+                    'id'            => (int) $todo_data['id'],
+                    'title'         => $todo_data['title'],
+                    'do_date'       => $todo_data['do_date'],
+                    'limit_date'    => $todo_data['limit_date'],
+                    'is_done'       => $todo_data['is_done'],
+                    'path'          => $todo_data['path'],
+                    'project_id'    => (int) $todo_data['project_id'],
+                    'user_id'       => (int) $todo_data['user_id'],
+                    'created'       => $todo_data['created'],
+                    'modified'      => $todo_data['modified'],
+                ],
                 'child' => [],
 //                'parent' => null,
             ];
