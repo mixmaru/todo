@@ -119,6 +119,88 @@ class Todo extends BaseModel
             throw new \Exception("データ取得に失敗しました");
         }
         $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $ret_tree_data = self::makeTreeData($records, $object);
+        return $ret_tree_data;
+    }
+
+    /**
+     * ユーザーを指定して、全てのプロジェクトデータと、それに関連する全てのTodoデータを取得する
+     * 返却データの形
+     * $ret_data = [
+     *      [
+     *          'project_data' => プロジェクトデータ,
+     *          'todo_data' => [todotreeデータ],
+     *      },
+     *      [
+     *          'project_data' => プロジェクトデータ,
+     *          'todo_data' => [todotreeデータ],
+     *      },
+     * ];
+     *
+     * @param $user_id
+     * @param bool $object
+     * @return array
+     * @throws \Exception
+     */
+    public static function getTodoListByUser($user_id){
+        new Todo;
+        $sql = "SELECT td.id, td.title, td.do_date, td.limit_date, td.is_done, td.path, td.project_id, td.user_id, td.created, td.modified, "
+             . "pj.id as pj_id, pj.name as pj_name, pj.view_order as pj_view_order, pj.user_id as pj_user_id, pj.created as pj_created, pj.modified as pj_modified "
+             . "FROM `todo` td "
+             . "INNER JOIN project pj ON pj.id = td.project_id "
+             . "WHERE td.user_id = :user_id "
+             . "ORDER BY pj.view_order ASC, (LENGTH(path) - LENGTH(REPLACE(path, '/', '')) -1) ASC";
+        $stmt = self::$pdo->prepare($sql);
+        if(!$stmt->execute([':user_id' => $user_id])){
+            throw new \Exception("データ取得に失敗しました");
+        }
+        $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        if(count($records) == 0){
+            return [];
+        }
+
+        $ret_data = [];
+        $count = 0;
+        $tmp_project_id = $records[0]['project_id'];
+        $tmp_records = [];
+        foreach($records as $record){
+            if($tmp_project_id != $record['project_id']){
+                //１プロジェクト分のデータを作成して次の処理へ進む
+                $project_data = [
+                    'id'            => (int) $tmp_records[0]['pj_id'],
+                    'name'          => $tmp_records[0]['pj_name'],
+                    'view_order'    => $tmp_records[0]['pj_view_order'],
+                    'user_id'       => $tmp_records[0]['pj_user_id'],
+                    'created'       => $tmp_records[0]['pj_created'],
+                    'modified'      => $tmp_records[0]['pj_modified'],
+                ];
+                $ret_data[$count] = [
+                    'project_data' => $project_data,
+                    'todo_data' => self::makeTreeData($tmp_records, false),
+                ];
+                //次の処理のための処理
+                $tmp_records = [];
+                $tmp_project_id = $record['project_id'];
+                $count++;
+            }
+            $tmp_records[] = $record;
+        }
+        if(count($tmp_records) > 0){
+            $project_data = [
+                'id'            => (int) $tmp_records[0]['pj_id'],
+                'name'          => $tmp_records[0]['pj_name'],
+                'view_order'    => $tmp_records[0]['pj_view_order'],
+                'user_id'       => $tmp_records[0]['pj_user_id'],
+                'created'       => $tmp_records[0]['pj_created'],
+                'modified'      => $tmp_records[0]['pj_modified'],
+            ];
+            $ret_data[$count] = [
+                'project_data' => $project_data,
+                'todo_data' => self::makeTreeData($tmp_records, false),
+            ];
+        }
+        return $ret_data;
+    }
 
 
     /**
