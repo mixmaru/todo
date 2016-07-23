@@ -142,18 +142,7 @@ class Todo extends BaseModel
      * @throws \Exception
      */
     public static function getTodoListByUser($user_id){
-        new Todo;
-        $sql = "SELECT td.id, td.title, td.do_date, td.limit_date, td.is_done, td.path, td.project_id, td.user_id, td.created, td.modified, "
-             . "pj.id as pj_id, pj.name as pj_name, pj.view_order as pj_view_order, pj.user_id as pj_user_id, pj.created as pj_created, pj.modified as pj_modified "
-             . "FROM `todo` td "
-             . "INNER JOIN project pj ON pj.id = td.project_id "
-             . "WHERE td.user_id = :user_id "
-             . "ORDER BY pj.view_order ASC, (LENGTH(path) - LENGTH(REPLACE(path, '/', '')) -1) ASC";
-        $stmt = self::$pdo->prepare($sql);
-        if(!$stmt->execute([':user_id' => $user_id])){
-            throw new \Exception("データ取得に失敗しました");
-        }
-        $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $records = self::getProjectTodoRecords($user_id);
         if(count($records) == 0){
             return [];
         }
@@ -270,40 +259,7 @@ class Todo extends BaseModel
      * @throws \Exception
      */
     public static function getTodoListByDay($user_id, $start_date, $limit_date = null){
-        new Todo();
-        $sql = "SELECT
-                    td.id,
-                    td.title,
-                    td.do_date,
-                    td.limit_date,
-                    td.is_done,
-                    td.path,
-                    td.project_id,
-                    td.user_id,
-                    td.created,
-                    td.modified,
-                    pj.id as pj_id,
-                    pj.name as pj_name,
-                    pj.view_order as pj_view_order,
-                    pj.user_id as pj_user_id,
-                    pj.created as pj_created,
-                    pj.modified as pj_modified
-                FROM todo td
-                    INNER JOIN project pj ON pj.id = td.project_id
-                WHERE td.user_id = :user_id
-                AND td.do_date BETWEEN :start_date AND :limit_date
-                OR td.limit_date BETWEEN :start_date AND :limit_date
-                ORDER BY pj.view_order ASC, (LENGTH(path) - LENGTH(REPLACE(path, '/', '')) - 1) ASC";
-        $params = [
-            ':user_id' => $user_id,
-            ':start_date' => $start_date,
-            ':limit_date' => $limit_date,
-        ];
-        $stmt = self::$pdo->prepare($sql);
-        if(!$stmt->execute($params)){
-            throw new \Exception("データ取得に失敗しました");
-        }
-        $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $records = self::getProjectTodoRecords($user_id, $start_date, $limit_date);
         if(count($records) == 0){
             return [];
         }
@@ -350,6 +306,71 @@ class Todo extends BaseModel
         }
 
         return $ret_data;
+    }
+
+    /**
+     * recordsデータから、プロジェクトとtodoリストのデータを返す。
+     * $user_idのみ渡した時：そのユーザーの全てのプロジェクトと、それに紐づくTodoデータのrecordデータ配列を返す
+     * $start_dataも渡された時は、プロジェクト毎にその日にdo_data(着手日)かlimit_data(締切日)が設定されているTodoデータのrecordデータ配列を返す
+     * $limit_dataも渡された時は、$start_dataから$limit_dateまでの範囲で上記のデータを返す。$limit_dateのみ渡されていた場合は無視される
+     * todo: 引数名$limit_dateがTodoのカラム名とかぶっていてややこしい
+     *
+     * @param $user_id
+     * @param null $start_date :
+     * @param null $limit_date
+     * @return array
+     * @throws \Exception
+     */
+    private static function getProjectTodoRecords($user_id, $start_date = null, $limit_date = null){
+        new Todo();
+        $get_data_mode = (isset($start_date)) ? "date" : "all";//all or date
+
+        $params = [];
+        $where_sql = "WHERE td.user_id = :user_id ";
+        $params['user_id'] = $user_id;
+        if($get_data_mode == "date"){
+            $where_sql .="AND td.do_date BETWEEN :start_date AND :limit_date "
+                       . "OR td.limit_date BETWEEN :start_date AND :limit_date ";
+            $params[':start_date'] = $start_date;
+            $params[':limit_date'] = $limit_date;
+        }
+        $order_sql = "ORDER BY ";
+        if($get_data_mode == "date"){
+            $order_sql .= "CASE WHEN td.do_date BETWEEN :start_date AND :limit_date THEN td.do_date ELSE td.limit_date END ASC, ";
+        }
+        $order_sql .= "pj.view_order ASC, "
+                     ."(LENGTH(path) - LENGTH(REPLACE(path, '/', '')) -1) ASC ";
+
+        //sqlの組み立て
+        $sql = "SELECT
+                    td.id,
+                    td.title,
+                    td.do_date,
+                    td.limit_date,
+                    td.is_done,
+                    td.path,
+                    td.project_id,
+                    td.user_id,
+                    td.created,
+                    td.modified,
+                    pj.id as pj_id,
+                    pj.name as pj_name,
+                    pj.view_order as pj_view_order,
+                    pj.user_id as pj_user_id,
+                    pj.created as pj_created,
+                    pj.modified as pj_modified
+                FROM todo td
+                    INNER JOIN project pj ON pj.id = td.project_id
+                ${where_sql}
+                ${order_sql}";
+
+        //sql実行
+        $stmt = self::$pdo->prepare($sql);
+        if(!$stmt->execute($params)){
+            throw new \Exception("データ取得に失敗しました");
+        }
+        $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $records;
     }
 
     /**
