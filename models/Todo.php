@@ -51,11 +51,52 @@ class Todo extends BaseModel
      * @throws \Exception
      */
     public static function getTodoListByDay($user_id, $start_date, $limit_date = null){
+        /**
+         * 着手日か、締切日のどちらの日にちを使うかを判断する
+         * todo_do_dateが指定範囲(getTodoListByDayの日にち指定)内なら、todo_do_dateを、そうでないなら$todo_limit_dateを返す
+         *
+         * @param $todo_do_date
+         * @param $todo_limit_date
+         * @return mixed
+         */
+        $resolveDate = function($todo_do_date, $todo_limit_date) use($start_date, $limit_date){
+            $start_time = strtotime($start_date);
+            $end_time = (isset($limit_date)) ? strtotime($limit_date) : $start_time;
+            $todo_do_date_time = strtotime($todo_do_date);
+            if($start_time <= $todo_do_date_time && $todo_do_date_time <= $end_time){
+                return $todo_do_date;
+            }else{
+                return $todo_limit_date;
+            }
+        };
         $records = self::getProjectTodoRecords($user_id, $start_date, $limit_date);
         if(count($records) == 0){
             return [];
         }
-        return self::makeProjectTodoListDataFromRecords($records, false);
+        $ret_array = [];
+        $tmp_date = $resolveDate($records[0]['do_date'], $records[0]['limit_date']);
+        $tmp_records = [];
+        foreach($records as $record){
+            $date = $resolveDate($record['do_date'], $record['limit_date']);
+            if($tmp_date != $date){
+                //ためていたデータで配列を作り、ためていたデータを初期化
+                $ret_array[] = [
+                    'date' => $tmp_date,
+                    'project_todo_data' => self::makeProjectTodoListDataFromRecords($tmp_records, false),
+                ];
+                $tmp_date = $resolveDate($record['do_date'], $record['limit_date']);
+                $tmp_records = [];
+            }
+            $tmp_records[] = $record;
+        }
+        //バッファがあればそのデータ配列を作り、追加する
+        if(count($tmp_records) > 0){
+                $ret_array[] = [
+                    'date' => $tmp_date,
+                    'project_todo_data' => self::makeProjectTodoListDataFromRecords($tmp_records, false),
+                ];
+        }
+        return $ret_array;
     }
 
     /**
