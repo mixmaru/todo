@@ -14,10 +14,9 @@ namespace models;
 
 class Todo extends BaseModel
 {
-    const TABLE_NAME = "todo";
-
     /**
-     * ユーザーを指定して、全てのプロジェクトデータと、それに関連する全てのTodoデータを取得する
+     * 全てのプロジェクトデータと、それに関連する全てのTodoデータを取得
+     *
      * 返却データの形
      * $ret_data = [
      *      [
@@ -67,43 +66,8 @@ class Todo extends BaseModel
         return $ret_data;
     }
 
-
     /**
-     * @param $records       :同一プロジェクトの深さ順にならんだTodoレコード配列
-     * @return array
-     */
-    private static function makeTreeData($records){
-        $ret_tree_data = [];//返却用Tree構造データ
-        $tmp_list_data = [];//Treeデータ作成に必要なlistデータ
-        foreach($records as $todo_data){
-            $path_array = array_filter(explode('/', $todo_data['path']), 'strlen');
-            $current_id = array_pop($path_array);
-            $parent_id = array_pop($path_array);
-            $tmp_list_data[$current_id] = [
-                'data' => self::getTodoDataFromRecord($todo_data),
-                'child' => [],
-//                'parent' => null,
-            ];
-            if(is_null($parent_id)){
-                $ret_tree_data[$current_id] = &$tmp_list_data[$current_id];
-            }else{
-//                $tmp_list_data[$current_id]['parent'] = &$tmp_list_data[$parent_id];
-                $tmp_list_data[$parent_id]['child'][$current_id] = &$tmp_list_data[$current_id];
-            }
-        }
-        return $ret_tree_data;
-    }
-
-    private static function makeListTodoData($records){
-        $ret_array = [];
-        foreach($records as $todo_data){
-            $ret_array[] = self::getTodoDataFromRecord($todo_data);
-        }
-        return $ret_array;
-    }
-
-    /**
-     * 日毎Todoリスト表示用メソッド。
+     * 日毎Todoリスト表示データの取得
      *
      * @param $user_id
      * @param $start_date :日にちを指定。$limitを指定しない場合はこの日のTodoリストが返る
@@ -143,6 +107,40 @@ class Todo extends BaseModel
         }
 
         return $ret_data;
+    }
+
+    /**
+     * @param $records       :同一プロジェクトの深さ順にならんだTodoレコード配列
+     * @return array
+     */
+    private static function makeTreeData($records){
+        $ret_tree_data = [];//返却用Tree構造データ
+        $tmp_list_data = [];//Treeデータ作成に必要なlistデータ
+        foreach($records as $todo_data){
+            $path_array = array_filter(explode('/', $todo_data['path']), 'strlen');
+            $current_id = array_pop($path_array);
+            $parent_id = array_pop($path_array);
+            $tmp_list_data[$current_id] = [
+                'data' => self::getTodoDataFromRecord($todo_data),
+                'child' => [],
+//                'parent' => null,
+            ];
+            if(is_null($parent_id)){
+                $ret_tree_data[$current_id] = &$tmp_list_data[$current_id];
+            }else{
+//                $tmp_list_data[$current_id]['parent'] = &$tmp_list_data[$parent_id];
+                $tmp_list_data[$parent_id]['child'][$current_id] = &$tmp_list_data[$current_id];
+            }
+        }
+        return $ret_tree_data;
+    }
+
+    private static function makeListTodoData($records){
+        $ret_array = [];
+        foreach($records as $todo_data){
+            $ret_array[] = self::getTodoDataFromRecord($todo_data);
+        }
+        return $ret_array;
     }
 
     /**
