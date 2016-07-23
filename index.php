@@ -1,5 +1,10 @@
 <?php
 use classes\View;
+
+//var_dumpが省略しないように。。
+ini_set('xdebug.var_display_max_children', -1);
+ini_set('xdebug.var_display_max_data', -1);
+ini_set('xdebug.var_display_max_depth', -1);
 /**
  * Created by IntelliJ IDEA.
  * User: mix
