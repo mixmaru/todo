@@ -47,16 +47,8 @@ class Todo extends BaseModel
         foreach($records as $record){
             if($tmp_project_id != $record['project_id']){
                 //１プロジェクト分のデータを作成して次の処理へ進む
-                $project_data = [
-                    'id'            => (int) $tmp_records[0]['pj_id'],
-                    'name'          => $tmp_records[0]['pj_name'],
-                    'view_order'    => $tmp_records[0]['pj_view_order'],
-                    'user_id'       => $tmp_records[0]['pj_user_id'],
-                    'created'       => $tmp_records[0]['pj_created'],
-                    'modified'      => $tmp_records[0]['pj_modified'],
-                ];
                 $ret_data[$count] = [
-                    'project_data' => $project_data,
+                    'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
                     'todo_data' => self::makeTreeData($tmp_records),
                 ];
                 //次の処理のための処理
@@ -67,16 +59,8 @@ class Todo extends BaseModel
             $tmp_records[] = $record;
         }
         if(count($tmp_records) > 0){
-            $project_data = [
-                'id'            => (int) $tmp_records[0]['pj_id'],
-                'name'          => $tmp_records[0]['pj_name'],
-                'view_order'    => $tmp_records[0]['pj_view_order'],
-                'user_id'       => $tmp_records[0]['pj_user_id'],
-                'created'       => $tmp_records[0]['pj_created'],
-                'modified'      => $tmp_records[0]['pj_modified'],
-            ];
             $ret_data[$count] = [
-                'project_data' => $project_data,
+                'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
                 'todo_data' => self::makeTreeData($tmp_records),
             ];
         }
@@ -96,18 +80,7 @@ class Todo extends BaseModel
             $current_id = array_pop($path_array);
             $parent_id = array_pop($path_array);
             $tmp_list_data[$current_id] = [
-                'data' => [
-                    'id'            => (int) $todo_data['id'],
-                    'title'         => $todo_data['title'],
-                    'do_date'       => $todo_data['do_date'],
-                    'limit_date'    => $todo_data['limit_date'],
-                    'is_done'       => $todo_data['is_done'],
-                    'path'          => $todo_data['path'],
-                    'project_id'    => (int) $todo_data['project_id'],
-                    'user_id'       => (int) $todo_data['user_id'],
-                    'created'       => $todo_data['created'],
-                    'modified'      => $todo_data['modified'],
-                ],
+                'data' => self::getTodoDataFromRecord($todo_data),
                 'child' => [],
 //                'parent' => null,
             ];
@@ -124,26 +97,13 @@ class Todo extends BaseModel
     private static function makeListTodoData($records){
         $ret_array = [];
         foreach($records as $todo_data){
-            $ret_array[] =  [
-                'id'            => (int) $todo_data['id'],
-                'title'         => $todo_data['title'],
-                'do_date'       => $todo_data['do_date'],
-                'limit_date'    => $todo_data['limit_date'],
-                'is_done'       => $todo_data['is_done'],
-                'path'          => $todo_data['path'],
-                'project_id'    => (int) $todo_data['project_id'],
-                'user_id'       => (int) $todo_data['user_id'],
-                'created'       => $todo_data['created'],
-                'modified'      => $todo_data['modified'],
-            ];
+            $ret_array[] = self::getTodoDataFromRecord($todo_data);
         }
         return $ret_array;
     }
 
     /**
      * 日毎Todoリスト表示用メソッド。
-     * todo: sql文をgetTodoListByUserと共通化できる
-     * todo: プロジェクトデータをセットする部分を共通化する
      *
      * @param $user_id
      * @param $start_date :日にちを指定。$limitを指定しない場合はこの日のTodoリストが返る
@@ -164,16 +124,8 @@ class Todo extends BaseModel
         foreach($records as $record){
             if($tmp_project_id != $record['project_id']){
                 //１プロジェクト分のデータを作成して次の処理へ進む
-                $project_data = [
-                    'id'            => (int) $tmp_records[0]['pj_id'],
-                    'name'          => $tmp_records[0]['pj_name'],
-                    'view_order'    => $tmp_records[0]['pj_view_order'],
-                    'user_id'       => $tmp_records[0]['pj_user_id'],
-                    'created'       => $tmp_records[0]['pj_created'],
-                    'modified'      => $tmp_records[0]['pj_modified'],
-                ];
                 $ret_data[$count] = [
-                    'project_data' => $project_data,
+                    'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
                     'todo_data' => self::makeListTodoData($tmp_records),
                 ];
                 //次の処理のための処理
@@ -184,21 +136,53 @@ class Todo extends BaseModel
             $tmp_records[] = $record;
         }
         if(count($tmp_records) > 0){
-            $project_data = [
-                'id'            => (int) $tmp_records[0]['pj_id'],
-                'name'          => $tmp_records[0]['pj_name'],
-                'view_order'    => $tmp_records[0]['pj_view_order'],
-                'user_id'       => $tmp_records[0]['pj_user_id'],
-                'created'       => $tmp_records[0]['pj_created'],
-                'modified'      => $tmp_records[0]['pj_modified'],
-            ];
             $ret_data[$count] = [
-                'project_data' => $project_data,
+                'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
                 'todo_data' => self::makeListTodoData($tmp_records),
             ];
         }
 
         return $ret_data;
+    }
+
+    /**
+     * getProjectTodoRecordsで帰ってくるレコードデータ配列の1レコードデータから、プロジェクトデータを返す
+     *
+     * @param $record: getProjectTodoRecordsで帰ってくるレコードデータ配列の1レコードデータ
+     * @return array
+     */
+    private static function getProjactDataFromRecord($record){
+        $ret_array = [
+            'id'            => (int) $record['pj_id'],
+            'name'          => $record['pj_name'],
+            'view_order'    => $record['pj_view_order'],
+            'user_id'       => $record['pj_user_id'],
+            'created'       => $record['pj_created'],
+            'modified'      => $record['pj_modified'],
+        ];
+        return $ret_array;
+    }
+
+    /**
+     * getProjectTodoRecordsで帰ってくるレコードデータ配列の1レコードデータから、Todoデータを返す
+     *
+     * @param $record: getProjectTodoRecordsで帰ってくるレコードデータ配列の1レコードデータ
+     * @return array
+     */
+    private static function getTodoDataFromRecord($record){
+        $ret_array = [
+            'id'            => (int) $record['id'],
+            'title'         => $record['title'],
+            'do_date'       => $record['do_date'],
+            'limit_date'    => $record['limit_date'],
+            'is_done'       => $record['is_done'],
+            'path'          => $record['path'],
+            'project_id'    => (int) $record['project_id'],
+            'user_id'       => (int) $record['user_id'],
+            'created'       => $record['created'],
+            'modified'      => $record['modified'],
+        ];
+        return $ret_array;
     }
 
     /**
