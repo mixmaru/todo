@@ -38,32 +38,7 @@ class Todo extends BaseModel
         if(count($records) == 0){
             return [];
         }
-
-        $ret_data = [];
-        $count = 0;
-        $tmp_project_id = $records[0]['project_id'];
-        $tmp_records = [];
-        foreach($records as $record){
-            if($tmp_project_id != $record['project_id']){
-                //１プロジェクト分のデータを作成して次の処理へ進む
-                $ret_data[$count] = [
-                    'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
-                    'todo_data' => self::makeTreeData($tmp_records),
-                ];
-                //次の処理のための処理
-                $tmp_records = [];
-                $tmp_project_id = $record['project_id'];
-                $count++;
-            }
-            $tmp_records[] = $record;
-        }
-        if(count($tmp_records) > 0){
-            $ret_data[$count] = [
-                'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
-                'todo_data' => self::makeTreeData($tmp_records),
-            ];
-        }
-        return $ret_data;
+        return self::makeProjectTodoListDataFromRecords($records, true);
     }
 
     /**
@@ -80,7 +55,19 @@ class Todo extends BaseModel
         if(count($records) == 0){
             return [];
         }
+        return self::makeProjectTodoListDataFromRecords($records, false);
+    }
 
+    /**
+     * getProjectTodoRecords()の返り値の$recordsを受け取り、controllerに返すためのプロジェクトとTodoのデータリストに整形する
+     * $tree=trueにすると、Todoデータをツリー構造にしようとするが、getProjectTodoRecordsで日毎のデータとして取得している場合はうまくTreeにならないと思う。
+     * 基本は全てのデータが揃っている時は$tree=true,そうでない時は$tree=falseで使う
+     *
+     * @param $records
+     * @param bool $tree
+     * @return array
+     */
+    private static function makeProjectTodoListDataFromRecords($records, $tree = false){
         $ret_data = [];
         $count = 0;
         $tmp_project_id = $records[0]['project_id'];
@@ -90,7 +77,7 @@ class Todo extends BaseModel
                 //１プロジェクト分のデータを作成して次の処理へ進む
                 $ret_data[$count] = [
                     'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
-                    'todo_data' => self::makeListTodoData($tmp_records),
+                    'todo_data' => ($tree) ? self::makeTreeData($tmp_records) : self::makeListTodoData($tmp_records),
                 ];
                 //次の処理のための処理
                 $tmp_records = [];
@@ -102,10 +89,9 @@ class Todo extends BaseModel
         if(count($tmp_records) > 0){
             $ret_data[$count] = [
                 'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
-                'todo_data' => self::makeListTodoData($tmp_records),
+                'todo_data' => ($tree) ? self::makeTreeData($tmp_records) : self::makeListTodoData($tmp_records),
             ];
         }
-
         return $ret_data;
     }
 
