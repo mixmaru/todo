@@ -99,6 +99,66 @@ class Todo extends BaseModel
         return $ret_array;
     }
 
+    public static function saveNewTodo($title, $do_date, $limit_date, $parent_path, $project_id, $user_id){
+        //必須項目のチェック
+        if(!isset($title) || !isset($parent_path) || !isset($user_id)){
+            throw new \Exception("title, parent_path, user_idを指定してください");
+        }
+        //チェックが必要なものはチェックする
+        //日付が正しいか確認
+        if(isset($do_date)){
+            if($do_date !== date("Y-m-d", strtotime($do_date))){
+                throw new \Exception("do_dateの日付指定を正しく行ってください");
+            }
+        }
+        if(isset($limit_date)){
+            if($limit_date !== date("Y-m-d", strtotime($limit_date))){
+                throw new \Exception("limit_dateの日付指定を正しく行ってください");
+            }
+        }
+        //parent_pathの指定が正しいかチェックしたいが、そのためにDBアクセスを行うのは負荷が高いので、チェックしない。
+        //project_idとuser_idの存在整合性はDBで行っているのでここでは行わない
+
+        new Todo();
+        //トランザクション開始
+        if(!self::$pdo->beginTransaction()){
+            throw new \Exception("トランザクション開始に失敗しました");
+        }
+
+        //todoテーブルに次に使われるid値を取得して登録するpathを用意
+        $stmt = self::$pdo->query("SHOW TABLE STATUS LIKE 'todo'");
+        $stmt->execute();
+        $todo_table_data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $next_id = (int) $todo_table_data['Auto_increment'];
+        $path = $parent_path."/${next_id}/";
+
+        //保存用sqlを作成
+        $sql = "INSERT INTO todo (title, do_date, limit_date, is_done, path, project_id, user_id, created) "
+              ."VALUES (:title, :do_date, :limit_date, :is_done, :path, :project_id, :user_id, :created)";
+        $params = [
+            ':title' => $title,
+            ':do_date' => $do_date,
+            ':limit_date' => $limit_date,
+            ':is_done' => "UNDONE",
+            ':path' => $path,
+            ':project_id' => $project_id,
+            ':user_id' => $user_id,
+            ':created' => date("Y-m-d H:i:s"),
+        ];
+        //sqlを実行
+        if(!$stmt = self::$pdo->prepare($sql)){
+            self::$pdo->rollBack();
+            throw new \Exception("データ登録に失敗しました");
+        }
+        if(!$stmt->execute($params)){
+            self::$pdo->rollBack();
+            throw new \Exception("データ登録に失敗しました");
+        }
+        //コミット
+        self::$pdo->commit();
+        return true;
+    }
+
     /**
      * getProjectTodoRecords()の返り値の$recordsを受け取り、controllerに返すためのプロジェクトとTodoのデータリストに整形する
      * $tree=trueにすると、Todoデータをツリー構造にしようとするが、getProjectTodoRecordsで日毎のデータとして取得している場合はうまくTreeにならないと思う。
