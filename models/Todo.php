@@ -101,23 +101,24 @@ class Todo extends BaseModel
 
     public static function saveNewTodo($title, $do_date, $limit_date, $parent_path, $project_id, $user_id){
         //必須項目のチェック
+        $error_msg = false;
         if(!isset($title) || !isset($parent_path) || !isset($user_id)){
-            throw new \Exception("title, parent_path, user_idを指定してください");
+            $error_msg .= "title, parent_path, user_idは必須引数です\n";
         }
         //チェックが必要なものはチェックする
         //日付が正しいか確認
-        if(isset($do_date)){
-            if($do_date !== date("Y-m-d", strtotime($do_date))){
-                throw new \Exception("do_dateの日付指定を正しく行ってください");
-            }
-        }
-        if(isset($limit_date)){
-            if($limit_date !== date("Y-m-d", strtotime($limit_date))){
-                throw new \Exception("limit_dateの日付指定を正しく行ってください");
+        foreach(['do_date', 'limit_date'] as $val_name){
+            if(isset($$val_name)){
+                if($$val_name !== date("Y-m-d", strtotime($$val_name))){
+                    $error_msg .= "${val_name}の日付指定を正しく行ってください\n";
+                }
             }
         }
         //parent_pathの指定が正しいかチェックしたいが、そのためにDBアクセスを行うのは負荷が高いので、チェックしない。
         //project_idとuser_idの存在整合性はDBで行っているのでここでは行わない
+        if($error_msg){
+            throw new \Exception($error_msg);
+        }
 
         new Todo();
         //トランザクション開始
@@ -146,11 +147,8 @@ class Todo extends BaseModel
             ':created' => date("Y-m-d H:i:s"),
         ];
         //sqlを実行
-        if(!$stmt = self::$pdo->prepare($sql)){
-            self::$pdo->rollBack();
-            throw new \Exception("データ登録に失敗しました");
-        }
-        if(!$stmt->execute($params)){
+        $stmt = self::$pdo->prepare($sql);
+        if(!($stmt && $stmt->execute($params))){
             self::$pdo->rollBack();
             throw new \Exception("データ登録に失敗しました");
         }
