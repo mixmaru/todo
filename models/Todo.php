@@ -170,6 +170,70 @@ class Todo extends BaseModel
     }
 
     /**
+     * $idで指定したTodoのデータを上書き編集する
+     * project_rootのTodoは編集できない
+     *
+     * @param $id
+     * @param $title
+     * @param $do_date
+     * @param $limit_date
+     * @param $parent_path :親のpathであることに注意
+     * @param $project_id
+     * @return bool
+     * @throws \Exception
+     */
+    static public function modifyTodo($id, $title, $do_date, $limit_date, $parent_path, $project_id){
+        //入力値チェック
+        $error_msg = false;
+        //idの入力確認。タイトルの入力確認。$parent_pathの確認。
+        if(empty($id) || empty($title) || empty($parent_path)){
+            $error_msg .= "id, title, parent_pathは必須引数です\n";
+        }
+        //日付が正しいか確認
+        foreach(['do_date', 'limit_date'] as $val_name){
+            if(isset($$val_name)){
+                if($$val_name !== date("Y-m-d", strtotime($$val_name))){
+                    $error_msg .= "${val_name}の日付指定を正しく行ってください\n";
+                }
+            }
+        }
+        //入力が正しくなければエラー
+        if($error_msg){
+            throw new \Exception($error_msg);
+        }
+
+        new Todo();
+
+        //project_rootは変更できないようにする
+        $project_root_check_sql = "SELECT title FROM todo WHERE id = :id ";
+        $stmt = self::$pdo->prepare($project_root_check_sql);
+        if(!$stmt->execute([':id' => $id])){
+            throw new \Exception("dbエラー");
+        }
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        if($result['title'] == "project_root"){
+            throw new \Exception("project_rootは変更できません");
+        }
+
+        //内容保存処理
+        $sql = "UPDATE todo SET title=:title, do_date=:do_date, limit_date=:limit_date, path=:path, project_id=:project_id "
+              ."WHERE id = :id";
+        $params = [
+            ':id' => $id,
+            ':title' => $title,
+            ':do_date' => $do_date,
+            ':limit_date' => $limit_date,
+            ':path' => $parent_path."${id}/",
+            ':project_id' => $project_id,
+        ];
+        $stmt = self::$pdo->prepare($sql);
+        if(!$stmt->execute($params)){
+            throw new \Exception("dbエラー");
+        }
+        return true;
+    }
+
+    /**
      * getProjectTodoRecords()の返り値の$recordsを受け取り、controllerに返すためのプロジェクトとTodoのデータリストに整形する
      * $tree=trueにすると、Todoデータをツリー構造にしようとするが、getProjectTodoRecordsで日毎のデータとして取得している場合はうまくTreeにならないと思う。
      * 基本は全てのデータが揃っている時は$tree=true,そうでない時は$tree=falseで使う
