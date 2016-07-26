@@ -99,10 +99,22 @@ class Todo extends BaseModel
         return $ret_array;
     }
 
+    /**
+     * 新しいTodoを保存する
+     *
+     * @param $title
+     * @param $do_date
+     * @param $limit_date
+     * @param $parent_path
+     * @param $project_id
+     * @param $user_id
+     * @return bool
+     * @throws \Exception
+     */
     public static function saveNewTodo($title, $do_date, $limit_date, $parent_path, $project_id, $user_id){
         //必須項目のチェック
         $error_msg = false;
-        if(!isset($title) || !isset($parent_path) || !isset($user_id)){
+        if(empty($title) || empty($parent_path) || empty($user_id)){
             $error_msg .= "title, parent_path, user_idは必須引数です\n";
         }
         //チェックが必要なものはチェックする
@@ -131,7 +143,7 @@ class Todo extends BaseModel
         $stmt->execute();
         $todo_table_data = $stmt->fetch(\PDO::FETCH_ASSOC);
         $next_id = (int) $todo_table_data['Auto_increment'];
-        $path = $parent_path."/${next_id}/";
+        $path = $parent_path."${next_id}/";
 
         //保存用sqlを作成
         $sql = "INSERT INTO todo (title, do_date, limit_date, is_done, path, project_id, user_id, created) "
