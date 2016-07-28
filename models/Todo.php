@@ -139,9 +139,7 @@ class Todo extends BaseModel
         }
 
         //todoテーブルに次に使われるid値を取得して登録するpathを用意
-        $stmt = self::$pdo->query("SHOW TABLE STATUS LIKE 'todo'");
-        $stmt->execute();
-        $todo_table_data = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $todo_table_data = self::$pdo->fetch("SHOW TABLE STATUS LIKE 'todo'");
         $next_id = (int) $todo_table_data['Auto_increment'];
         $path = $parent_path."${next_id}/";
 
@@ -159,11 +157,7 @@ class Todo extends BaseModel
             ':created' => date("Y-m-d H:i:s"),
         ];
         //sqlを実行
-        $stmt = self::$pdo->prepare($sql);
-        if(!($stmt && $stmt->execute($params))){
-            self::$pdo->rollBack();
-            throw new \Exception("データ登録に失敗しました");
-        }
+        self::$pdo->execute($sql, $params);
         //コミット
         self::$pdo->commit();
         return true;
@@ -206,11 +200,7 @@ class Todo extends BaseModel
 
         //project_rootは変更できないようにする
         $project_root_check_sql = "SELECT title FROM todo WHERE id = :id ";
-        $stmt = self::$pdo->prepare($project_root_check_sql);
-        if(!$stmt->execute([':id' => $id])){
-            throw new \Exception("dbエラー");
-        }
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $result = self::$pdo->fetch($project_root_check_sql);
         if($result['title'] == "project_root"){
             throw new \Exception("project_rootは変更できません");
         }
@@ -226,10 +216,7 @@ class Todo extends BaseModel
             ':path' => $parent_path."${id}/",
             ':project_id' => $project_id,
         ];
-        $stmt = self::$pdo->prepare($sql);
-        if(!$stmt->execute($params)){
-            throw new \Exception("dbエラー");
-        }
+        self::$pdo->execute($sql, $params);
         return true;
     }
 
@@ -401,11 +388,6 @@ class Todo extends BaseModel
                 ${order_sql}";
 
         //sql実行
-        $stmt = self::$pdo->prepare($sql);
-        if(!$stmt->execute($params)){
-            throw new \Exception("データ取得に失敗しました");
-        }
-        $records = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-        return $records;
+        return self::$pdo->fetchAll($sql, $params);
     }
 }

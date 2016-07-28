@@ -8,6 +8,7 @@
 namespace models;
 
 use classes\Config;
+use classes\UserPdo;
 
 class BaseModel{
     static protected $pdo;
@@ -25,7 +26,7 @@ class BaseModel{
             $config = new Config();
             $config_params = $config->getConfig();
             $db_params = $config_params['db'];
-            self::$pdo = new \PDO("mysql:host=".$db_params['host'].";dbname=".$db_params['db'], $db_params['user'], $db_params['password']);
+            self::$pdo = new UserPdo("mysql:host=".$db_params['host'].";dbname=".$db_params['db'], $db_params['user'], $db_params['password']);
         }
         $this->db = self::$pdo;
     }
