@@ -1,0 +1,11 @@
+<ul>
+    {% for todo in todo_data_array %}
+        <li>
+            {{todo.data.id}}
+            {{todo.data.title}}
+            {% if todo.child|length > 0 %}
+                {% include 'parts/todo_list.html' with {'todo_data_array': todo.child} only %}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

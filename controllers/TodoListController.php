@@ -36,7 +36,7 @@ class TodoListController
         }
 
         //全てのtodoデータを取得する
-        $todo_data_list = Todo::getAllTodo(false);
+        $todo_data_list = Todo::getTodoListByUser(1);
 
         //表示する
         $this->renderer->render("list", [
