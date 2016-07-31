@@ -221,6 +221,46 @@ class Todo extends BaseModel
     }
 
     /**
+     * 指定Todoを完了させる
+     *
+     * @param $todo_id
+     */
+    static public function finishTodo($todo_id){
+        self::changeDone($todo_id, "DONE");
+    }
+
+    static public function unFinishTodo($todo_id){
+        self::changeDone($todo_id, "UNDONE");
+    }
+
+    /**
+     * 指定Todoを削除する
+     *
+     * @param $todo_id
+     */
+    static public function deleteTodo($todo_id){
+        $sql = "DELETE FROM todo WHERE id = :id ";
+        new Todo();
+        self::$pdo->execute($sql, [':id' => $todo_id]);
+    }
+
+    /**
+     * todoのis_doneカラムを$toの値に変更する
+     *
+     * @param $todo_id
+     * @param $to       :"DONE" or "UNDONE";
+     */
+    static private function changeDone($todo_id, $to){
+        $sql = "UPDATE todo SET is_done=:is_done WHERE id = :id ";
+        $params = [
+            ':is_done' => $to,
+            ':id' => $todo_id,
+        ];
+        new Todo();
+        self::$pdo->execute($sql, $params);
+    }
+
+    /**
      * getProjectTodoRecords()の返り値の$recordsを受け取り、controllerに返すためのプロジェクトとTodoのデータリストに整形する
      * $tree=trueにすると、Todoデータをツリー構造にしようとするが、getProjectTodoRecordsで日毎のデータとして取得している場合はうまくTreeにならないと思う。
      * 基本は全てのデータが揃っている時は$tree=true,そうでない時は$tree=falseで使う
