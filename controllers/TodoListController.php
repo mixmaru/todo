@@ -38,10 +38,16 @@ class TodoListController
         //全てのtodoデータを取得する
         $todo_data_list = Todo::getTodoListByUser(1);
 
+        //使用するurlを用意
+        $url = [
+            'do_check' => "?controller=TodoList&action=Check",
+        ];
+
         //表示する
         $this->renderer->render("list", [
             'page_title' => "todoリスト",
             'todo_data_list' => $todo_data_list,
+            'url' => $url,
         ]);
     }
 
@@ -95,42 +101,46 @@ class TodoListController
         $method = $this->request->getMethod();
         if($method !== "post"){
             //404表示
+            $this->renderer->renderError(404);
         }
 
         //データ取得
         $input_data = $this->request->post();
 
-        //バリデーション。入力を想定しているのは、int id(必須), 0 or 1 check(必須)
-        /*todo
-        if(バリデーションng){
-            //不正な値エラー
+        //バリデーション。入力を想定しているのは、int todo_id(必須), change_to(必須): "done" or "undone"
+        $valid_error_msg = [];
+        if(  empty($input_data['todo_id'])
+          || !is_numeric($input_data['todo_id'])
+          || empty($input_data['change_to'])
+          || !in_array($input_data['change_to'], ["done", "undone"])){
+            $this->renderer->renderError(400);
         }
 
+        $change_to = $input_data['change_to'];
+        $todo_id = $input_data['todo_id'];
+
         //指定idのtodoデータのdoneステータスを指定のものに更新する
-        if(指定idのtodoデータが存在しない){
-            //不正な値エラー
-        }
-        $todo_obj = new Todo($id);
         try{
-            if($input_data['check']){
-                $todo_obj->setDone();
-            }else{
-                $todo_obj->setUnDone();
+            switch($change_to){
+                case "done":
+                    Todo::finishTodo($todo_id);
+                    break;
+                case "undone":
+                    Todo::unFinishTodo($todo_id);
+                    break;
+                default:
+                    $this->renderer->renderError();
+                    break;
             }
-        }catch(Exeption $e){
-            $message = "データの更新に失敗しました";
-            $this->flash->set($message);
-            //ログへ記録
-            error_log($message);
-            if(リファラがある){
-                //リファラへリダイレクト
-                header('Location: リファラ');
-            }//リファラがない場合は一覧へ。
+        }catch (\Exception $e){
+            //データ更新失敗
+            //todo: エラメッセージをセットして一覧ページへリダイレクト。エラーメッセージを表示する
+            echo "データ更新失敗";
         }
-        //一覧へリダイレクト
-        header('Location: /');
+
+        //一覧ページへリダイレクト。todo:リクエストクラスで行うようにする？
+        header('Location: /?controller=TodoList&action=List');
         exit();
-        */
     }
 
     /**

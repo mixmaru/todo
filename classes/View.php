@@ -45,6 +45,11 @@ class View
     public function renderError($error_code = 404, $error_message = null){
         $args = [];
         switch($error_code){
+            case 400:
+                $template = "error/400";
+                $args['message'] = (!is_null($error_message)) ? $error_message : "不正なアクセスです";
+                header("HTTP/1.0 400 Bad Request");
+                break;
             case 404:
                 $template = "error/404";
                 $args['message'] = (!is_null($error_message)) ? $error_message : "このページは存在しません";
@@ -56,6 +61,7 @@ class View
                 header("HTTP/1.0 501 Not Implemented");
         }
         $this->render($template, $args);
+        exit();
     }
 
 }

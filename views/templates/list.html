@@ -7,7 +7,7 @@
             <div>
                 <p>{{data.project_data.name}}</p>
                 {% for todo_data in data.todo_data %}
-                    {% include 'parts/todo_list.html' with {'todo_data_array': todo_data.child} only %}
+                    {% include 'parts/todo_list.html' with {'todo_data_array': todo_data.child, 'url': url} only %}
                 {% endfor %}
             </div>
         {% endfor %}
