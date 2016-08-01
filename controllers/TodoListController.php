@@ -26,6 +26,34 @@ class TodoListController
     }
 
     /**
+     * 日毎Todo一覧表示
+     */
+    public function actionDayList(){
+        if($this->request->getMethod() !== "get"){
+            //404を表示する
+            $this->renderer->renderError(404);
+        }
+
+        //指定日のtodoデータを取得する
+        //todo:user_idをログインユーザーのものにする
+        //todo:日付を当日のものにする
+        $todo_data_list = Todo::getTodoListByDay(1, "2016-07-20", "2016-07-21");
+
+        //使用するurlを用意
+        $url = [
+            'do_check' => "?controller=TodoList&action=Check",
+            'check_redirect' => "/?controller=TodoList&action=DayList",
+        ];
+
+        //表示する
+        $this->renderer->render("day_list", [
+            'page_title' => "todoリスト",
+            'todo_data_list' => $todo_data_list,
+            'url' => $url,
+        ]);
+    }
+
+    /**
      * todo一覧表示
      */
     public function actionList(){
@@ -41,6 +69,7 @@ class TodoListController
         //使用するurlを用意
         $url = [
             'do_check' => "?controller=TodoList&action=Check",
+            'check_redirect' => "/?controller=TodoList&action=List",
         ];
 
         //表示する
@@ -107,17 +136,19 @@ class TodoListController
         //データ取得
         $input_data = $this->request->post();
 
-        //バリデーション。入力を想定しているのは、int todo_id(必須), change_to(必須): "done" or "undone"
+        //バリデーション。入力を想定しているのは、int todo_id(必須), change_to(必須): "done" or "undone", redirect_url(必須)
         $valid_error_msg = [];
         if(  empty($input_data['todo_id'])
           || !is_numeric($input_data['todo_id'])
           || empty($input_data['change_to'])
-          || !in_array($input_data['change_to'], ["done", "undone"])){
+          || !in_array($input_data['change_to'], ["done", "undone"])
+          || empty($input_data['redirect_url'])){
             $this->renderer->renderError(400);
         }
 
         $change_to = $input_data['change_to'];
         $todo_id = $input_data['todo_id'];
+        $redirect_url = $input_data['redirect_url'];
 
         //指定idのtodoデータのdoneステータスを指定のものに更新する
         try{
@@ -139,7 +170,7 @@ class TodoListController
         }
 
         //一覧ページへリダイレクト。todo:リクエストクラスで行うようにする？
-        header('Location: /?controller=TodoList&action=List');
+        header('Location: '.$redirect_url);
         exit();
     }
 
