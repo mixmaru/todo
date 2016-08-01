@@ -392,8 +392,13 @@ class Todo extends BaseModel
         $where_sql = "WHERE td.user_id = :user_id ";
         $params['user_id'] = $user_id;
         if($get_data_mode == "date"){
-            $where_sql .="AND td.do_date BETWEEN :start_date AND :limit_date "
-                       . "OR td.limit_date BETWEEN :start_date AND :limit_date ";
+            if(is_null($limit_date)){
+                $where_sql .="AND td.do_date = :start_date "
+                    . "OR td.limit_date = :start_date ";
+            }else{
+                $where_sql .="AND td.do_date BETWEEN :start_date AND :limit_date "
+                    . "OR td.limit_date BETWEEN :start_date AND :limit_date ";
+            }
             $params[':start_date'] = $start_date;
             $params[':limit_date'] = $limit_date;
         }
