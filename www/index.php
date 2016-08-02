@@ -21,7 +21,7 @@ ini_set('xdebug.var_display_max_depth', -1);
  * 例：/?controller=hoge&action=huga
  *　　　上記はhogeController->actionhugaが実行される
  */
-define("ROOT_PATH", dirname(__FILE__)."/");
+define("ROOT_PATH", dirname(__FILE__)."/../");
 define("CONTROLLER_DIR_PATH", ROOT_PATH."controllers/");
 define("MODEL_DIR_PATH", ROOT_PATH."models/");
 define("VIEW_DIR_PATH", ROOT_PATH."views/");
@@ -32,9 +32,9 @@ define("CONFIG_DIR_PATH", ROOT_PATH."config/");
 //オートロードの設定
 spl_autoload_register(function($name){
     $name = str_replace("\\", DIRECTORY_SEPARATOR, $name);
-    $file = $name.".php";
+    $file = ROOT_PATH.$name.".php";
     if(file_exists($file)){
-        include_once ROOT_PATH.$name.".php";
+        include_once $file;
     }else{
         throw new Exception("クラスファイルが存在しません");
     }
