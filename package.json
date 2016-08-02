@@ -1,0 +1,23 @@
+{
+  "name": "source",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mixmaru/todo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mixmaru/todo/issues"
+  },
+  "homepage": "https://github.com/mixmaru/todo#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-ruby-sass": "^2.0.6"
+  }
+}
