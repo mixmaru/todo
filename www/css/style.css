@@ -363,3 +363,6 @@ textarea {
   /* 1 */
   font: inherit;
   /* 2 */ }
+
+body {
+  background-color: #CCCCCC; }
