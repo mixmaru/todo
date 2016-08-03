@@ -11,6 +11,19 @@
     {% endblock %}
 </head>
 <body>
-{% block content %}{% endblock %}
+    <header>
+        <h1>マインTodo</h1>
+        <ul>
+            <li>
+                <a href="">デイリー</a>
+                <a href="">プロジェクト</a>
+            </li>
+        </ul>
+        <a href="">完了を削除</a>
+    </header>
+    {% block content %}{% endblock %}
+    <footer>
+        <p>&copy; 2016 mixmaru</p>
+    </footer>
 </body>
 </html>
