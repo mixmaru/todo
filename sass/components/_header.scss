@@ -1,0 +1,33 @@
+.header{
+  background-color: #990C00;
+  height: 60px;
+  text-align: center;
+}
+.header__siteName{
+  font-size: 15px;
+  color: #DBB3AF;
+  float: left;
+}
+.header__tabBlock{
+  @include inline-block();
+  letter-spacing: -.40em;
+}
+.header__tabButtonWrapper{
+  @include inline-block();
+  letter-spacing: normal;
+}
+.header__tab{
+  @include inline-block();
+  color: #ffffff;
+  height: 60px;
+  font-size: 20px;
+  padding: {
+    top: 17px;
+    left: 5px;
+    right: 5px;
+  }
+}
+.header__tab--active{
+  background-color: rgba(255, 255, 255, 0.2);
+  border-bottom: solid 3px #ffffff;
+}

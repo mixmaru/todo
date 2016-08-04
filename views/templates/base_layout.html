@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,user-scalable=no">
     <title>{{page_title}}</title>
     {% block css %}
         <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -11,15 +12,17 @@
     {% endblock %}
 </head>
 <body>
-    <header>
-        <h1>マインTodo</h1>
-        <ul>
-            <li>
-                <a href="">デイリー</a>
-                <a href="">プロジェクト</a>
+    <header class="header">
+        <h1 class="header__siteName">マインTodo</h1>
+        <ul class="header__tabBlock">
+            <li class="header__tabButtonWrapper">
+                <a class="header__tab header__tab--active" href="">デイリー</a>
+            </li>
+            <li class="header__tabButtonWrapper">
+                <a class="header__tab" href="">プロジェクト</a>
             </li>
         </ul>
-        <a href="">完了を削除</a>
+        <a class="header__deleteButton button" href="">完了を削除</a>
     </header>
     {% block content %}{% endblock %}
     <footer>

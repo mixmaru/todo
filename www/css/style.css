@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*! normalize.css v4.1.1 | MIT License | github.com/necolas/normalize.css */
 /**
  * 1. Change the default font family in all browsers (opinionated).
@@ -364,5 +365,100 @@ textarea {
   font: inherit;
   /* 2 */ }
 
+p, h1, h2, h3, h4, h5, h6 {
+  margin: 0; }
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0; }
+
+*, *:before, *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+a {
+  text-decoration: none; }
+
 body {
+  font-family: Helvetica,Arial, Roboto, “Droid Sans”, “游ゴシック”, YuGothic,“ヒラギノ角ゴ ProN W3″,“Hiragino Kaku Gothic ProN”, “メイリオ”,Meiryo, sans-serif;
   background-color: #CCCCCC; }
+
+.header {
+  background-color: #990C00;
+  height: 60px;
+  text-align: center; }
+
+.header__siteName {
+  font-size: 15px;
+  color: #DBB3AF;
+  float: left; }
+
+.header__tabBlock {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  letter-spacing: -.40em; }
+
+.header__tabButtonWrapper {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  letter-spacing: normal; }
+
+.header__tab {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  color: #ffffff;
+  height: 60px;
+  font-size: 20px;
+  padding-top: 17px;
+  padding-left: 5px;
+  padding-right: 5px; }
+
+.header__tab--active {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-bottom: solid 3px #ffffff; }
+
+.button {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  padding: 4px 10px;
+  border: solid 1px #999999;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2YwZjBmMCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #f0f0f0));
+  background: -moz-linear-gradient(#ffffff, #f0f0f0);
+  background: -webkit-linear-gradient(#ffffff, #f0f0f0);
+  background: linear-gradient(#ffffff, #f0f0f0);
+  *zoom: 1;
+  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#FFFFFFFF', endColorstr='#FFF0F0F0');
+  color: #333333;
+  text-align: center;
+  font-size: 13px; }
+
+.button--linkColor {
+  color: #0044cc; }
+
+.button--underLine {
+  text-decoration: underline; }
+
+.button--big {
+  font-size: 20px; }
+
+.button--small {
+  padding: 2px 5px;
+  font-size: 15px; }

@@ -1,0 +1,57 @@
+.button{
+  @include inline-block;
+  padding: 4px 10px;
+  border: solid 1px #999999;
+  @include border-radius(4px);
+  @include background(linear-gradient(white, #f0f0f0));
+  @include filter-gradient(white, #f0f0f0, vertical);
+  color: #333333;
+  text-align: center;
+  font-size: 13px;
+}
+
+.button--linkColor{
+  color: #0044cc;
+}
+
+.button--underLine{
+  text-decoration: underline;
+}
+
+.button--big{
+  font-size: 20px;
+}
+.button--small{
+  padding: 2px 5px;
+  font-size: 15px;
+}
+
+//.button--primary{
+//  @include text-shadow(rgba(0,0,0,0.3) 1px 0 0);
+//  color: #ffffff;
+//  @include background(linear-gradient(#ff3333, $color--main));
+//  @include filter-gradient(#ff3333 , $color--main, vertical);
+//  border: solid 1px #990000;
+//}
+//.button--primary2{
+//  border: solid 1px #106499;
+//  @include background(linear-gradient(#6aabd4, #106ca6));
+//  @include filter-gradient(#6aabd4, #106ca6, vertical);
+//  color: #ffffff;
+//  @include text-shadow(rgba(0,0,0,0.3) 0 1px 0);
+//}
+//.button--green{
+//  border: solid 1px #008024;
+//  @include background(linear-gradient(#00e660, #00c251));
+//  @include filter-gradient(#00e660, #00c251, vertical);
+//  color: #ffffff;
+//  @include text-shadow(rgba(0,0,0,0.3) 0 1px 0);
+//}
+//.button--bold{
+//  font-weight: bold;
+//}
+//.button--black{
+//  border: none;
+//  color: #ffffff;
+//  @include background(linear-gradient(#000000 + #111111, #000000));
+//}
