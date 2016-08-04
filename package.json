@@ -18,6 +18,7 @@
   "homepage": "https://github.com/mixmaru/todo#readme",
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-ruby-sass": "^2.0.6"
+    "gulp-ruby-sass": "^2.0.6",
+    "gulp-sftp": "^0.1.5"
   }
 }
