@@ -6,7 +6,7 @@ gulp.task('default', function() {
 });
 
 gulp.task('sass', function() {
-    return sass('./sass/**/*.scss')
+    return sass('./sass/**/*.scss', { compass: true })
         .on('error', sass.logError)
         .pipe(gulp.dest('./www/css'));
 });
