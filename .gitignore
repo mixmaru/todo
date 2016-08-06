@@ -1,5 +1,6 @@
 #configファイル
 config/config.php
+config/host.json
 
 
 # テスト環境用vagrant関連の除外
