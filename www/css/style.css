@@ -521,3 +521,9 @@ body {
 .dayList__checkBox {
   font-size: 10px;
   width: 80px; }
+
+.footer {
+  margin-top: 10px; }
+
+.footer__copy {
+  text-align: center; }
