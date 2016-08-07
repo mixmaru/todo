@@ -31,7 +31,7 @@
                                         <input class="dayList__checkBox button" type="submit" value="{{submit_value}}">
                                         <input type="hidden" name="todo_id" value="{{todo_data.id}}">
                                         <input type="hidden" name="change_to" value="{{change_to}}">
-                                        <input type="hidden" name="redirect_url" value="{{url.check_redirect}}">
+                                        <input type="hidden" name="redirect_url" value="{{current}}">
                                     </form>
                                 </div>
                                 <p class="dayList__todoTitle {% if todo_data.is_done == 'DONE' %}dayList__todoTitle--done{% endif %}">

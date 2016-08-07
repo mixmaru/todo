@@ -16,10 +16,10 @@
         <h1 class="header__siteName">マインTodo</h1>
         <ul class="header__tabBlock">
             <li class="header__tabButtonWrapper">
-                <a class="header__tab header__tab--active" href="">デイリー</a>
+                <a class="header__tab {% if current == '/?controller=TodoList&action=DayList' %}header__tab--active{% endif %}" href="{{url.daily_list}}">デイリー</a>
             </li>
             <li class="header__tabButtonWrapper">
-                <a class="header__tab" href="">プロジェクト</a>
+                <a class="header__tab {% if current == '/?controller=TodoList&action=List' %}header__tab--active{% endif %}" href="{{url.project_list}}">プロジェクト</a>
             </li>
         </ul>
         <a class="header__deleteButton button" href="">完了を削除</a>

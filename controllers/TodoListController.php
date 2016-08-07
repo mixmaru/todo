@@ -18,6 +18,13 @@ class TodoListController
 {
     private $request;
     private $renderer;  //レンダラー。テンプレートエンジンオブジェクトを格納する
+
+    //遷移url
+    private $url = [
+        'do_check' => "?controller=TodoList&action=Check",
+        'project_list' => "/?controller=TodoList&action=List",
+        'daily_list' => "/?controller=TodoList&action=DayList",
+    ];
     public function __construct()
     {
         $this->request = new Request();
@@ -39,17 +46,12 @@ class TodoListController
         //todo:日付を当日のものにする
         $todo_data_list = Todo::getTodoListByDay(1, "2016-07-20", "2016-07-21");
 
-        //使用するurlを用意
-        $url = [
-            'do_check' => "?controller=TodoList&action=Check",
-            'check_redirect' => "/?controller=TodoList&action=DayList",
-        ];
-
         //表示する
         $this->renderer->render("day_list", [
             'page_title' => "todoリスト",
             'todo_data_list' => $todo_data_list,
-            'url' => $url,
+            'url' => $this->url,
+            'current' => $this->url['daily_list'],
         ]);
     }
 
@@ -66,17 +68,12 @@ class TodoListController
         //全てのtodoデータを取得する
         $todo_data_list = Todo::getTodoListByUser(1);
 
-        //使用するurlを用意
-        $url = [
-            'do_check' => "?controller=TodoList&action=Check",
-            'check_redirect' => "/?controller=TodoList&action=List",
-        ];
-
         //表示する
         $this->renderer->render("list", [
             'page_title' => "todoリスト",
             'todo_data_list' => $todo_data_list,
-            'url' => $url,
+            'url' => $this->url,
+            'current' => $this->url['project_list'],
         ]);
     }
 
