@@ -462,3 +462,62 @@ body {
 .button--small {
   padding: 2px 5px;
   font-size: 15px; }
+
+.dayList {
+  background-color: #ffffff;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3); }
+
+.dayList__header {
+  padding: 2px 0;
+  position: relative;
+  color: #990C00;
+  font-size: 15px; }
+
+.dayList__dayTitle {
+  text-align: center; }
+
+.dayList__date {
+  position: absolute;
+  top: 2px;
+  right: 3px; }
+
+.dayList__projectWrapper {
+  border-top: solid 5px #FFD6D1;
+  padding: 0 10px; }
+
+.dayList__projectTitle {
+  font-size: 15px;
+  font-weight: bold;
+  position: relative;
+  top: 5px; }
+
+.dayList__todoListWrapper {
+  position: relative; }
+
+.dayList__todo {
+  font-size: 18px;
+  padding: 10px 0;
+  clear: both;
+  border-top: solid 2px #FFF1EF; }
+  .dayList__todo:first-child {
+    border-top: none; }
+
+.dayList__checkWrapper {
+  float: left;
+  width: 80px; }
+
+.dayList__todoTitle {
+  padding-left: 90px; }
+
+.dayList__todoTitle--done {
+  color: #999999;
+  text-decoration: line-through; }
+
+.dayList__checkBox {
+  font-size: 10px;
+  width: 80px; }
