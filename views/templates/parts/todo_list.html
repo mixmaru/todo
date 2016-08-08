@@ -13,7 +13,7 @@
                     <input class="todoList__checkBox button" type="submit" value="{{submit_value}}">
                     <input type="hidden" name="todo_id" value="{{todo.data.id}}">
                     <input type="hidden" name="change_to" value="{{change_to}}">
-                    <input type="hidden" name="redirect_url" value="{{url.check_redirect}}">
+                    <input type="hidden" name="redirect_url" value="{{current}}">
                 </form>
             </div>
             <div class="todoList__todoTitle {% if todo.data.is_done == 'DONE' %}todoList__todoTitle--done{% endif %}">
@@ -23,7 +23,7 @@
             </div>
             {% if todo.child|length > 0 %}
             <div class="todoList__child">
-                {% include 'parts/todo_list.html' with {'todo_data_array': todo.child, 'url': url} only %}
+                {% include 'parts/todo_list.html' with {'todo_data_array': todo.child, 'url': url, 'current': current} only %}
             </div>
             {% endif %}
         </li>
