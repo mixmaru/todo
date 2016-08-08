@@ -1,0 +1,5 @@
+.card{
+  background-color: #ffffff;
+  @include border-radius(4px);
+  @include card_box_shadow();
+}

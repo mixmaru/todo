@@ -3,7 +3,7 @@
 {% block content %}
     {% if todo_data_list|length > 0 %}
         {% for data in todo_data_list %}
-            <div class="dayList" style="margin-top: 10px;">
+            <div class="card dayList" style="margin-top: 10px;">
                 <header class="dayList__header">
                     {% if loop.index == 1 %}
                         <p class="dayList__dayTitle">ToDay</p>
@@ -16,10 +16,10 @@
                     {% for project_data in data.project_todo_data %}
                     <article class="dayList__projectWrapper">
                         <h2 class="dayList__projectTitle">{{project_data.project_data.name}}</h2>
-                        <ul class="dayList__todoListWrapper">
+                        <ul class="dayList__todoListWrapper todoList">
                             {% for todo_data in project_data.todo_data %}
-                            <li class="dayList__todo">
-                                <div class="dayList__checkWrapper">
+                            <li class="todoList__todo">
+                                <div class="todoList__checkWrapper">
                                     <form action="{{url.do_check}}" method="post">
                                         {% if todo_data.is_done == "DONE" %}
                                         {% set submit_value = "未完了にする" %}
@@ -28,13 +28,13 @@
                                         {% set submit_value = "完了にする" %}
                                         {% set change_to = "done" %}
                                         {% endif %}
-                                        <input class="dayList__checkBox button" type="submit" value="{{submit_value}}">
+                                        <input class="todoList__checkBox button" type="submit" value="{{submit_value}}">
                                         <input type="hidden" name="todo_id" value="{{todo_data.id}}">
                                         <input type="hidden" name="change_to" value="{{change_to}}">
                                         <input type="hidden" name="redirect_url" value="{{current}}">
                                     </form>
                                 </div>
-                                <p class="dayList__todoTitle {% if todo_data.is_done == 'DONE' %}dayList__todoTitle--done{% endif %}">
+                                <p class="todoList__todoTitle {% if todo_data.is_done == 'DONE' %}todoList__todoTitle--done{% endif %}">
                                     {{todo_data.title}}
                                 </p>
                             </li>

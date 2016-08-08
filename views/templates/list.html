@@ -4,11 +4,15 @@
 
     {% if todo_data_list|length > 0 %}
         {% for data in todo_data_list %}
-            <div>
-                <p>{{data.project_data.name}}</p>
-                {% for todo_data in data.todo_data %}
-                    {% include 'parts/todo_list.html' with {'todo_data_array': todo_data.child, 'url': url} only %}
-                {% endfor %}
+            <div class="card projectList" style="margin-top: 10px;">
+                <header class="projectList__header">
+                    <p class="projectList__projectName">{{data.project_data.name}}</p>
+                </header>
+                <article class="projectList__contentWrapper">
+                    {% for todo_data in data.todo_data %}
+                        {% include 'parts/todo_list.html' with {'todo_data_array': todo_data.child, 'url': url} only %}
+                    {% endfor %}
+                </article>
             </div>
         {% endfor %}
     {% else %}

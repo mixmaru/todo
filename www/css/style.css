@@ -428,6 +428,15 @@ body {
   background-color: rgba(255, 255, 255, 0.2);
   border-bottom: solid 3px #ffffff; }
 
+.card {
+  background-color: #ffffff;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3); }
+
 .button {
   display: inline-block;
   vertical-align: middle;
@@ -463,15 +472,6 @@ body {
   padding: 2px 5px;
   font-size: 15px; }
 
-.dayList {
-  background-color: #ffffff;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
-  -moz-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3); }
-
 .dayList__header {
   padding: 2px 0;
   position: relative;
@@ -496,31 +496,46 @@ body {
   position: relative;
   top: 5px; }
 
-.dayList__todoListWrapper {
+.projectList__header {
+  padding: 2px 10px;
+  position: relative;
+  font-size: 15px;
+  font-weight: bold; }
+
+.projectList__contentWrapper {
+  border-top: solid 5px #FFD6D1;
+  padding: 0 10px; }
+
+.todoList {
   position: relative; }
 
-.dayList__todo {
+.todoList__todo {
   font-size: 18px;
   padding: 10px 0;
   clear: both;
   border-top: solid 2px #FFF1EF; }
-  .dayList__todo:first-child {
+  .todoList__todo:first-child {
     border-top: none; }
 
-.dayList__checkWrapper {
+.todoList__checkWrapper {
   float: left;
   width: 80px; }
 
-.dayList__todoTitle {
+.todoList__todoTitle {
   padding-left: 90px; }
 
-.dayList__todoTitle--done {
+.todoList__todoTitle--done {
   color: #999999;
   text-decoration: line-through; }
 
-.dayList__checkBox {
+.todoList__checkBox {
   font-size: 10px;
   width: 80px; }
+
+.todoList__child {
+  margin-top: 10px;
+  border-top: solid 2px #FFF1EF;
+  padding-left: 10px; }
 
 .footer {
   margin-top: 10px; }

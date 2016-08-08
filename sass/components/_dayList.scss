@@ -1,7 +1,4 @@
 .dayList{
-  background-color: #ffffff;
-  @include border-radius(4px);
-  @include card_box_shadow();
 }
 .dayList__header{
   padding: 2px 0;
@@ -31,31 +28,4 @@
   top: 5px;
 }
 .dayList__todoListWrapper{
-  position: relative;
-}
-.dayList__todo{
-  font-size: 18px;
-  padding: 10px 0;
-  clear: both;
-  border-top: solid 2px #FFF1EF;
-  &:first-child{
-    border-top: none;
-  }
-}
-.dayList__checkWrapper{
-  float: left;
-  width: 80px;
-}
-.dayList__todoTitle{
-  padding:{
-    left: 90px;
-  }
-}
-.dayList__todoTitle--done{
-  color: #999999;
-  text-decoration: line-through;
-}
-.dayList__checkBox{
-  font-size: 10px;
-  width: 80px;
 }

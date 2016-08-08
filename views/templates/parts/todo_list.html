@@ -1,24 +1,30 @@
-<ul>
+<ul class="todoList">
     {% for todo in todo_data_array %}
-        <li>
-            <form action="{{url.do_check}}" method="post">
-                {% if todo.data.is_done == "DONE" %}
+        <li class="todoList__todo">
+            <div class="todoList__checkWrapper">
+                <form action="{{url.do_check}}" method="post">
+                    {% if todo.data.is_done == "DONE" %}
                     {% set submit_value = "未完了にする" %}
                     {% set change_to = "undone" %}
-                {% else %}
+                    {% else %}
                     {% set submit_value = "完了にする" %}
                     {% set change_to = "done" %}
-                {% endif %}
-                <input type="submit" value="{{submit_value}}">
-                <input type="hidden" name="todo_id" value="{{todo.data.id}}">
-                <input type="hidden" name="change_to" value="{{change_to}}">
-                <input type="hidden" name="redirect_url" value="{{url.check_redirect}}">
-            </form>
-            {{todo.data.title}}
-            {{todo.data.do_date}}
-            {{todo.data.limit_date}}
+                    {% endif %}
+                    <input class="todoList__checkBox button" type="submit" value="{{submit_value}}">
+                    <input type="hidden" name="todo_id" value="{{todo.data.id}}">
+                    <input type="hidden" name="change_to" value="{{change_to}}">
+                    <input type="hidden" name="redirect_url" value="{{url.check_redirect}}">
+                </form>
+            </div>
+            <div class="todoList__todoTitle {% if todo.data.is_done == 'DONE' %}todoList__todoTitle--done{% endif %}">
+                {{todo.data.title}}
+                {{todo.data.do_date}}
+                {{todo.data.limit_date}}
+            </div>
             {% if todo.child|length > 0 %}
+            <div class="todoList__child">
                 {% include 'parts/todo_list.html' with {'todo_data_array': todo.child, 'url': url} only %}
+            </div>
             {% endif %}
         </li>
     {% endfor %}

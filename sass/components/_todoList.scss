@@ -1,0 +1,34 @@
+.todoList{
+  position: relative;
+}
+.todoList__todo{
+  font-size: 18px;
+  padding: 10px 0;
+  clear: both;
+  border-top: solid 2px #FFF1EF;
+  &:first-child{
+    border-top: none;
+  }
+}
+.todoList__checkWrapper{
+  float: left;
+  width: 80px;
+}
+.todoList__todoTitle{
+  padding:{
+    left: 90px;
+  }
+}
+.todoList__todoTitle--done{
+  color: #999999;
+  text-decoration: line-through;
+}
+.todoList__checkBox{
+  font-size: 10px;
+  width: 80px;
+}
+.todoList__child{
+  margin-top: 10px;
+  border-top: solid 2px #FFF1EF;
+  padding-left: 10px;
+}
