@@ -16,10 +16,18 @@
                     <input type="hidden" name="redirect_url" value="{{current}}">
                 </form>
             </div>
-            <div class="todoList__todoTitle {% if todo.data.is_done == 'DONE' %}todoList__todoTitle--done{% endif %}">
-                {{todo.data.title}}
-                {{todo.data.do_date}}
-                {{todo.data.limit_date}}
+            <div class="todoList__todoData {% if todo.data.is_done == 'DONE' %}todoList__todoData--done{% endif %}">
+                <p class="todoList__todoTitle">
+                    {{todo.data.title}}
+                </p>
+                <ul class="todoList__todoDateInfo">
+                    <li class="todoList__todoDateList">
+                        {{todo.data.do_date}}
+                    </li>
+                    <li class="todoList__todoDateList">
+                        {{todo.data.limit_date}}
+                    </li>
+                </ul>
             </div>
             {% if todo.child|length > 0 %}
             <div class="todoList__child">

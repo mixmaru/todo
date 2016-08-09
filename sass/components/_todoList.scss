@@ -2,6 +2,7 @@
   position: relative;
 }
 .todoList__todo{
+  position: relative;
   font-size: 18px;
   padding: 10px 0;
   clear: both;
@@ -11,17 +12,25 @@
   }
 }
 .todoList__checkWrapper{
-  float: left;
+  @include inline-block;
   width: 80px;
 }
-.todoList__todoTitle{
+.todoList__todoData{
+  @include inline-block;
   padding:{
-    left: 90px;
+    left: 10px;
   }
 }
-.todoList__todoTitle--done{
+.todoList__todoData--done{
   color: #999999;
   text-decoration: line-through;
+}
+.todoList__todoTitle{
+}
+.todoList__todoDateInfo{
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 .todoList__checkBox{
   font-size: 10px;

@@ -34,9 +34,11 @@
                                         <input type="hidden" name="redirect_url" value="{{current}}">
                                     </form>
                                 </div>
-                                <p class="todoList__todoTitle {% if todo_data.is_done == 'DONE' %}todoList__todoTitle--done{% endif %}">
-                                    {{todo_data.title}}
-                                </p>
+                                <div class="todoList__todoData">
+                                    <p class="todoList__todoTitle {% if todo_data.is_done == 'DONE' %}todoList__todoData--done{% endif %}">
+                                        {{todo_data.title}}
+                                    </p>
+                                </div>
                             </li>
                             {% endfor %}
                         </ul>
