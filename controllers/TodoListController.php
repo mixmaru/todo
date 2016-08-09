@@ -24,6 +24,7 @@ class TodoListController
         'do_check' => "?controller=TodoList&action=Check",
         'project_list' => "/?controller=TodoList&action=List",
         'daily_list' => "/?controller=TodoList&action=DayList",
+        'todo_edit' => "/?controller=TodoList&action=Edit",
     ];
     public function __construct()
     {
@@ -81,6 +82,7 @@ class TodoListController
      * todoデータの変更
      */
     public function actionEdit(){
+        var_dump("edit");
         /*todo:
         $method = $request->getMethod();
         if($method === "get"){
