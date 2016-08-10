@@ -7,7 +7,6 @@
  */
 namespace models;
 
-use classes\Config;
 use classes\UserPdo;
 
 class BaseModel{
@@ -23,10 +22,7 @@ class BaseModel{
     {
         //pdo接続はインスタンス間で使い回す
         if(is_null(self::$pdo)){
-            $config = new Config();
-            $config_params = $config->getConfig();
-            $db_params = $config_params['db'];
-            self::$pdo = new UserPdo("mysql:host=".$db_params['host'].";dbname=".$db_params['db'], $db_params['user'], $db_params['password']);
+            self::$pdo = new UserPdo("mysql:host=".DB_HOST.";dbname=".DB_DB, DB_USER, DB_PASS);
         }
         $this->db = self::$pdo;
     }

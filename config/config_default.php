@@ -14,6 +14,20 @@ $db = [
     'password' => "password",
     'db' => "db_name",
 ];
+$db = [
+    'test' => [
+        'host' => "host_name",
+        'user' => "user_name",
+        'password' => "password",
+        'db' => "db_name",
+    ],
+    'unit_test' => [
+        'host' => "host_name",
+        'user' => "user_name",
+        'password' => "password",
+        'db' => "db_name",
+    ]
+];
 
 return [
     "db" => $db,
