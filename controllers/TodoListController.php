@@ -12,6 +12,7 @@ namespace controllers;
 use classes\FlashMessage;
 use classes\Request;
 use models\Todo;
+use models\Project;
 use classes\View;
 
 class TodoListController
@@ -99,8 +100,7 @@ class TodoListController
                 $todo_data = Todo::getTodo($input_id, 1);//todo: ログイン機能つけるまでuser_idは1に決め打ち
             }
             //すべてのプロジェクトデータを取得
-            $all_project = [];
-//            $all_project_data = Project::getAll(1);
+            $all_project = Project::getAll(1);
             //Todoデータがあれば全てのTodoリストデータを取得
             $all_todo_list = [];
             if(!empty($todo_data)){
