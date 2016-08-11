@@ -15,6 +15,21 @@ namespace models;
 class Todo extends BaseModel
 {
     /**
+     * todoのidに対応するTodoデータを返す。
+     * 他のuserのTodoデータを取得しないように$user_idが必須
+     *
+     * @param $id
+     * @param $user_id
+     * @return array
+     */
+    public static function getTodo($id, $user_id){
+        new Todo();
+        $sql = "SELECT * FROM todo WHERE id = :id AND user_id = :user_id";
+        $result = self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
+        return self::getTodoDataFromRecord($result);
+    }
+
+    /**
      * 全てのプロジェクトデータと、それに関連する全てのTodoデータを取得
      *
      * 返却データの形
@@ -30,11 +45,11 @@ class Todo extends BaseModel
      * ];
      *
      * @param $user_id
+     * @param null $project_id //対象プロジェクトを絞り込む
      * @return array
-     * @throws \Exception
      */
-    public static function getTodoListByUser($user_id){
-        $records = self::getProjectTodoRecords($user_id);
+    public static function getTodoListByUser($user_id, $project_id = null){
+        $records = self::getProjectTodoRecords($user_id, null, null, $project_id);
         if(count($records) == 0){
             return [];
         }
@@ -381,16 +396,20 @@ class Todo extends BaseModel
      * @param $user_id
      * @param null $start_date :
      * @param null $limit_date
+     * @param null $project_id //指定プロジェクトidで絞り込む
      * @return array
-     * @throws \Exception
      */
-    private static function getProjectTodoRecords($user_id, $start_date = null, $limit_date = null){
+    private static function getProjectTodoRecords($user_id, $start_date = null, $limit_date = null, $project_id = null){
         new Todo();
         $get_data_mode = (isset($start_date)) ? "date" : "all";//all or date
 
         $params = [];
         $where_sql = "WHERE td.user_id = :user_id ";
         $params['user_id'] = $user_id;
+        if($project_id){
+            $where_sql .= "AND td.project_id = :project_id ";
+            $params['project_id'] = $project_id;
+        }
         if($get_data_mode == "date"){
             if(is_null($limit_date)){
                 $where_sql .="AND td.do_date = :start_date "

@@ -82,21 +82,36 @@ class TodoListController
      * todoデータの変更
      */
     public function actionEdit(){
-        var_dump("edit");
-        /*todo:
-        $method = $request->getMethod();
+        $method = $this->request->getMethod();
         if($method === "get"){
             //編集入力フォーム
             //バリデーション（入力を想定しているのはint id(必須ではない)）
-            if(バリデーションng){
-                //不正な値エラー表示
+            $input_id = $this->request->get("id");
+            if($input_id){
+                if(!is_numeric($input_id)){
+                    //不正な値の場合は値を捨てる
+                    $input_id = false;
+                }
             }
-            $id = isset($data['id']) ? $data['id'] : null;
-            $todo_obj = new Todo($id);
-            $todo_data = $todo_obj->getPropertyToArray();
-            $this->render("", [
+            $todo_data = [];
+            if($input_id){
+                //データ取得
+                $todo_data = Todo::getTodo($input_id, 1);//todo: ログイン機能つけるまでuser_idは1に決め打ち
+            }
+            //すべてのプロジェクトデータを取得
+            $all_project = [];
+//            $all_project_data = Project::getAll(1);
+            //Todoデータがあれば全てのTodoリストデータを取得
+            $all_todo_list = [];
+            if(!empty($todo_data)){
+                $all_todo_list = Todo::getTodoListByUser(1, $todo_data['project_id']);
+            }
+            $this->renderer->render("todo_modify", [
                 'todo_data' => $todo_data,
+                'all_project' => $all_project,
+                'all_todo_list' => $all_todo_list,
             ]);
+
         }elseif($method === "post"){
             //編集実行
             $input_data = $this->request->post();
@@ -118,7 +133,6 @@ class TodoListController
         }else{
             //404
         }
-        */
     }
 
     /**
