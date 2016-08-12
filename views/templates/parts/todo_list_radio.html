@@ -1,0 +1,11 @@
+{% for todo_list in all_todo_list %}
+  <ul>
+    <li>
+      <label>
+        <input type="radio" name="parent_todo" value="{{ todo_list.data.id }}">
+        {{ todo_list.data.title }}
+      </label>
+      {% include 'parts/todo_list_radio.html' with {'all_todo_list': todo_list.child, 'target_todo': target_todo} only %}
+    </li>
+  </ul>
+{% endfor %}

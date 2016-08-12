@@ -107,9 +107,12 @@ class TodoListController
                 $all_todo_list = Todo::getTodoListByUser(1, $todo_data['project_id']);
             }
             $this->renderer->render("todo_modify", [
+                'page_title' => "Todo編集",
                 'todo_data' => $todo_data,
                 'all_project' => $all_project,
-                'all_todo_list' => $all_todo_list,
+                'all_todo_list' => $all_todo_list[0]['todo_data'],
+                'url' => $this->url,
+                'current' => $this->url['todo_edit'],
             ]);
 
         }elseif($method === "post"){

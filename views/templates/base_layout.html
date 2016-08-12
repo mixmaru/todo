@@ -12,6 +12,7 @@
     {% endblock %}
 </head>
 <body>
+    {% block header %}
     <header class="header">
         <h1 class="header__siteName">マインTodo</h1>
         <ul class="header__tabBlock">
@@ -24,6 +25,7 @@
         </ul>
         <a class="header__deleteButton button" href="">完了を削除</a>
     </header>
+    {% endblock %}
     {% block content %}{% endblock %}
     <footer class="footer">
         <p class="footer__copy">&copy; 2016 mixmaru</p>
