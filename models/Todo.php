@@ -26,6 +26,8 @@ class Todo extends BaseModel
         new Todo();
         $sql = "SELECT * FROM todo WHERE id = :id AND user_id = :user_id";
         $result = self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
+        //親idを取り出してデータとして持たせる
+        $result['parent_id'] = self::convertParentIdByPath($result['path']);
         return self::getTodoDataFromRecord($result);
     }
 
@@ -371,19 +373,12 @@ class Todo extends BaseModel
      * @return array
      */
     private static function getTodoDataFromRecord($record){
-        $ret_array = [
-            'id'            => (int) $record['id'],
-            'title'         => $record['title'],
-            'do_date'       => $record['do_date'],
-            'limit_date'    => $record['limit_date'],
-            'is_done'       => $record['is_done'],
-            'path'          => $record['path'],
-            'project_id'    => (int) $record['project_id'],
-            'user_id'       => (int) $record['user_id'],
-            'created'       => $record['created'],
-            'modified'      => $record['modified'],
-        ];
-        return $ret_array;
+        foreach($record as $key => &$value){
+            if(in_array($key, ['id', 'project_id', 'user_id'])){
+                $value = (int) $value;
+            }
+        }
+        return $record;
     }
 
     /**
@@ -453,5 +448,16 @@ class Todo extends BaseModel
 
         //sql実行
         return self::$pdo->fetchAll($sql, $params);
+    }
+
+    /**
+     * todoテーブルのpathの値から、親Todo idを返す
+     *
+     * @param $path
+     * @return int
+     */
+    private static function convertParentIdByPath($path){
+        $path_array = explode("/", $path);
+        return (int) $path_array[count($path_array) - 3];
     }
 }

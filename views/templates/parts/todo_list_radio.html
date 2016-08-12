@@ -2,7 +2,7 @@
   <ul>
     <li>
       <label>
-        <input type="radio" name="parent_todo" value="{{ todo_list.data.id }}">
+        <input type="radio" name="parent_todo" value="{{ todo_list.data.id }}" {% if target_todo.parent_id == todo_list.data.id %}checked{% endif %}>
         {{ todo_list.data.title }}
       </label>
       {% include 'parts/todo_list_radio.html' with {'all_todo_list': todo_list.child, 'target_todo': target_todo} only %}
