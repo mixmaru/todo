@@ -2,6 +2,7 @@
 
 @import "normalize";
 @import "user_reset";
+@import "sprite";
 @import "components/layout";
 @import "components/header";
 @import "components/card";
@@ -10,3 +11,8 @@
 @import "components/projectList";
 @import "components/todoList";
 @import "components/footer";
+
+.sprite_test{
+  @include retina-sprite($email-group);
+  @include inline-block;
+}

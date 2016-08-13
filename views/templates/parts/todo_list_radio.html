@@ -2,6 +2,7 @@
   <ul>
     <li>
       <label>
+        <i class="sprite_test"></i>
         <input type="radio" name="parent_todo" value="{{ todo_list.data.id }}" {% if target_todo.parent_id == todo_list.data.id %}checked{% endif %}>
         {{ todo_list.data.title }}
       </label>
