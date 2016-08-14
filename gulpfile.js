@@ -6,6 +6,7 @@ var spritesmith = require("gulp.spritesmith");
 gulp.task('default', function() {
     gulp.watch("./sass/**/*.scss", ["sass"]);
     gulp.watch("./www/css/**/*.css", ["css-upload"]);
+    gulp.watch("./www/img/**/*", ["img-upload"]);
 });
 
 //scss -> css変換
@@ -41,5 +42,16 @@ gulp.task('css-upload', function(){
             host: host_conf.test.host,
             user: host_conf.test.user,
             remotePath: '/var/www/html/www/css/'
+        }));
+});
+
+//imgのアップロード
+gulp.task('img-upload', function(){
+    var host_conf = require("./config/host.json");
+    return gulp.src('www/img/**/*')
+        .pipe(sftp({
+            host: host_conf.test.host,
+            user: host_conf.test.user,
+            remotePath: '/var/www/html/www/img/'
         }));
 });
