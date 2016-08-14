@@ -1,0 +1,60 @@
+.todoModify{
+  background-color: #ffffff;
+  input[type=text]{
+    border: 1px solid #e6e6e6;
+    @include border-radius(4px);
+    padding: 5px;
+  }
+  input[type=date]{
+    border: 1px solid #e6e6e6;
+    @include border-radius(4px);
+    padding: 5px;
+    background-color: transparent;
+  }
+}
+
+.todoModify__titleBlock,
+.todoModify__limitDateBlock,
+.todoModify__doDateBlock,
+.todoModify__projectBlock,
+.todoModify__parentTodoBlock
+{
+  padding: 10px;
+  border-bottom: 1px solid #E6E6E6;
+}
+.todoModify__title{
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.todoModify__inputText{
+  display: block;
+  width: 100%;
+}
+.todoModify__inputDate{
+  display: block;
+  width: 100%;
+}
+
+.todoModify__projectListBlock{
+
+}
+.todoModify__projectListList,
+.todoModify__todoListBlock{
+  margin: {
+    top: 10px;
+    left: 10px;
+  }
+  &:first-child{
+    margin-top: 0;
+  }
+}
+.todoModify__newProjectInputText{
+  display: block;
+  width: 100%;
+  padding-left: 20px;
+  margin: {
+    top: 3px;
+  }
+}
+

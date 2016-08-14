@@ -1,59 +1,52 @@
 {% extends "base_layout.html" %}
 {% block header %}
-    <header class="header">
-        <a href=""><i class="icon__returnArrow"></i></a>
-        <h1>Todo編集</h1>
-        <a class="button" href="">登録ボタン</a>
+    <header class="headerReturn">
+        <h1 class="headerReturn__title">Todo編集</h1>
+        <a class="headerReturn__returnButton" class="" href=""><i class="icon__returnArrow"></i></a>
+        <a class="headerReturn__submitButton button" href="">登録ボタン</a>
     </header>
 {% endblock %}
 {% block content %}
     <section class="todoModify">
         <form action="" method="post">
             <div class="todoModify__titleBlock">
-                <h2>タイトル</h2>
-                <div>
-                    <input placeholder="インターステラーを観る" type="text" name="" value="{{ todo_data.title }}">
-                </div>
+                <h2 class="todoModify__title">タイトル</h2>
+                <input class="todoModify__inputText" placeholder="インターステラーを観る" type="text" name="" value="{{ todo_data.title }}">
             </div>
-            <div>
-                <h2>締切</h2>
-                <div>
-                    <input type="date" name="" value="{{ todo_data.limit_date }}">
-                </div>
+            <div class="todoModify__limitDateBlock">
+                <h2 class="todoModify__title">締切</h2>
+                <input class="todoModify__inputDate" type="date" name="" value="{{ todo_data.limit_date }}">
             </div>
-            <div>
-                <h2>着手日</h2>
-                <div>
-                    <input type="date" name="" value="{{ todo_data.do_date }}">
-                </div>
+            <div class="todoModify__doDateBlock">
+                <h2 class="todoModify__title">着手日</h2>
+                <input class="todoModify__inputDate" type="date" name="" value="{{ todo_data.do_date }}">
             </div>
-            <div>
-                <h2>プロジェクト</h2>
-                <ul>
-                    <li>
-                        {% for project in all_project %}
+            <div class="todoModify__projectBlock">
+                <h2 class="todoModify__title">プロジェクト</h2>
+                <ul class="todoModify__projectListBlock">
+                    {% for project in all_project %}
+                        <li class="todoModify__projectListList">
                             <label>
                                 <input type="radio" name="project" value="{{ project.id }}" {% if project.id == todo_data.project_id %}checked{% endif %}>
                                 {{ project.name }}
                             </label>
-                        {% endfor %}
+                        </li>
+                    {% endfor %}
+                    <li class="todoModify__projectListList">
                         <label>
                             <input type="radio" name="project" value="-1">
                             新しいプロジェクト
-                            <input type="text" name="new_project_name" value="" placeholder="社運を賭けたプロジェクト">
+                            <input class="todoModify__newProjectInputText" type="text" name="new_project_name" value="" placeholder="社運を賭けたプロジェクト">
                         </label>
                     </li>
                 </ul>
             </div>
-            <div>
-                <h2>親作業</h2>
+            <div class="todoModify__parentTodoBlock">
+                <h2 class="todoModify__title">親作業</h2>
                 {% for todo_root in all_todo_list %}
                     {% include 'parts/todo_list_radio.html' with {'all_todo_list': todo_root.child, 'target_todo': todo_data} only %}
                 {% endfor %}
             </div>
         </form>
     </section>
-    {#{todo_data.title}}
-    {{dump(all_project)}}
-    {{dump(all_todo_list)}#}
 {% endblock %}

@@ -511,6 +511,34 @@ body {
   background-color: rgba(255, 255, 255, 0.2);
   border-bottom: solid 3px #ffffff; }
 
+.headerReturn {
+  background-color: #990C00;
+  height: 60px;
+  position: relative;
+  text-align: center; }
+
+.headerReturn__title {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: normal;
+  position: relative;
+  top: 17px; }
+
+.headerReturn__returnButton {
+  position: absolute;
+  top: 17px;
+  left: 10px; }
+
+.headerReturn__submitButton {
+  position: absolute;
+  top: 17px;
+  right: 10px; }
+
 .card {
   background-color: #ffffff;
   -moz-border-radius: 4px;
@@ -649,3 +677,54 @@ body {
 
 .footer__copy {
   text-align: center; }
+
+.todoModify {
+  background-color: #ffffff; }
+  .todoModify input[type=text] {
+    border: 1px solid #e6e6e6;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    padding: 5px; }
+  .todoModify input[type=date] {
+    border: 1px solid #e6e6e6;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    padding: 5px;
+    background-color: transparent; }
+
+.todoModify__titleBlock,
+.todoModify__limitDateBlock,
+.todoModify__doDateBlock,
+.todoModify__projectBlock,
+.todoModify__parentTodoBlock {
+  padding: 10px;
+  border-bottom: 1px solid #E6E6E6; }
+
+.todoModify__title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px; }
+
+.todoModify__inputText {
+  display: block;
+  width: 100%; }
+
+.todoModify__inputDate {
+  display: block;
+  width: 100%; }
+
+.todoModify__projectListList,
+.todoModify__todoListBlock {
+  margin-top: 10px;
+  margin-left: 10px; }
+  .todoModify__projectListList:first-child,
+  .todoModify__todoListBlock:first-child {
+    margin-top: 0; }
+
+.todoModify__newProjectInputText {
+  display: block;
+  width: 100%;
+  padding-left: 20px;
+  margin-top: 3px; }

@@ -1,0 +1,24 @@
+.headerReturn{
+  background-color: #990C00;
+  height: 60px;
+  position: relative;
+  text-align: center;
+}
+.headerReturn__title{
+  @include inline-block;
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: normal;
+  position: relative;
+  top: 17px;
+}
+.headerReturn__returnButton{
+  position: absolute;
+  top: 17px;
+  left: 10px;
+}
+.headerReturn__submitButton{
+  position: absolute;
+  top: 17px;
+  right: 10px;
+}
