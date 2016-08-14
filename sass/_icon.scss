@@ -1,0 +1,4 @@
+.icon__returnArrow{
+  @include inline-block;
+  @include retina-sprite($return-arrow-group);
+}

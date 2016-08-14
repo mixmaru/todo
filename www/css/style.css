@@ -449,6 +449,21 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
 
 @include retina-sprites($retina-groups);
 */
+.icon__returnArrow {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  background-image: url(/img/sprite.png);
+  background-position: 0px 0px;
+  width: 26px;
+  height: 24px; }
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .icon__returnArrow {
+      background-image: url(/img/sprite@2x.png);
+      background-size: 26px 24px; } }
+
 body {
   font-family: Helvetica,Arial, Roboto, “Droid Sans”, “游ゴシック”, YuGothic,“ヒラギノ角ゴ ProN W3″,“Hiragino Kaku Gothic ProN”, “メイリオ”,Meiryo, sans-serif;
   background-color: #CCCCCC; }
@@ -634,18 +649,3 @@ body {
 
 .footer__copy {
   text-align: center; }
-
-.sprite_test {
-  background-image: url(/img/sprite.png);
-  background-position: 0px 0px;
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  vertical-align: middle;
-  *vertical-align: auto;
-  *zoom: 1;
-  *display: inline; }
-  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    .sprite_test {
-      background-image: url(/img/sprite-2x.png);
-      background-size: 32px 32px; } }

@@ -24,10 +24,10 @@ gulp.task('sprite', function(){
             imgName: 'sprite.png',
             cssName: '_sprite.scss',
             imgPath: '/img/sprite.png',
-            cssFormat: 'scss',
-            retinaSrcFilter: './images/*-2x.png',
-            retinaImgName: 'sprite-2x.png',
-            retinaImgPath: 'images/sprite-2x.png'
+            //cssFormat: 'scss',//この指定があるとscssにretina用の記述が追加されないらしい。参考：https://tech.recruit-mp.co.jp/front-end/post-6844/
+            retinaSrcFilter: './images/*@2x.png',
+            retinaImgName: 'sprite@2x.png',
+            retinaImgPath: '/img/sprite@2x.png'
         }));
     spriteData.img.pipe(gulp.dest('./www/img/'));
     spriteData.css.pipe(gulp.dest('./sass/'));
