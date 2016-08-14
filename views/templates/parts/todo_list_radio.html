@@ -1,6 +1,6 @@
 {% for todo_list in all_todo_list %}
   <ul class="todoModify__todoListBlock">
-    <li class="todoModify__todoListList">
+    <li class="todoModify__todoListList {% if todo_list.data.is_done == "DONE" %}todoModify__todoListList--done{% endif %}">
       <label>
         <input type="radio" name="parent_todo" value="{{ todo_list.data.id }}" {% if target_todo.parent_id == todo_list.data.id %}checked{% endif %}>
         {{ todo_list.data.title }}

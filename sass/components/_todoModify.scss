@@ -49,6 +49,10 @@
     margin-top: 0;
   }
 }
+.todoModify__todoListList--done{
+  color: #999999;
+  text-decoration: line-through;
+}
 .todoModify__newProjectInputText{
   display: block;
   width: 100%;
