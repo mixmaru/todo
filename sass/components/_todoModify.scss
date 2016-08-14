@@ -1,5 +1,4 @@
 .todoModify{
-  background-color: #ffffff;
   input[type=text]{
     border: 1px solid #e6e6e6;
     @include border-radius(4px);
@@ -21,6 +20,9 @@
 {
   padding: 10px;
   border-bottom: 1px solid #E6E6E6;
+}
+.todoModify__submitBlock{
+  padding: 10px;
 }
 .todoModify__title{
   font-size: 20px;
@@ -61,4 +63,22 @@
     top: 3px;
   }
 }
-
+.todoModify__submitBlock{
+  text-align: center;
+  position: relative;
+}
+.todoModify__submitButton{
+  padding: {
+    left: 20px;
+    right: 20px;
+  }
+}
+.todoModify__deleteButton{
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  padding: {
+    left: 20px;
+    right: 20px;
+  }
+}

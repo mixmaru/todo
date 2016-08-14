@@ -26,13 +26,13 @@
   font-size: 15px;
 }
 
-//.button--primary{
-//  @include text-shadow(rgba(0,0,0,0.3) 1px 0 0);
-//  color: #ffffff;
-//  @include background(linear-gradient(#ff3333, $color--main));
-//  @include filter-gradient(#ff3333 , $color--main, vertical);
-//  border: solid 1px #990000;
-//}
+.button--primary{
+  @include text-shadow(rgba(0,0,0,0.3) 1px 0 0);
+  color: #ffffff;
+  @include background(linear-gradient(#990C00, #990C00));
+  @include filter-gradient(#990C00 , #990C00, vertical);
+  border: solid 1px #990000;
+}
 //.button--primary2{
 //  border: solid 1px #106499;
 //  @include background(linear-gradient(#6aabd4, #106ca6));

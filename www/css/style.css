@@ -464,9 +464,59 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
       background-image: url(/img/sprite@2x.png);
       background-size: 26px 24px; } }
 
-body {
+.button {
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  *zoom: 1;
+  *display: inline;
+  padding: 4px 10px;
+  border: solid 1px #999999;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2YwZjBmMCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #f0f0f0));
+  background: -moz-linear-gradient(#ffffff, #f0f0f0);
+  background: -webkit-linear-gradient(#ffffff, #f0f0f0);
+  background: linear-gradient(#ffffff, #f0f0f0);
+  *zoom: 1;
+  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#FFFFFFFF', endColorstr='#FFF0F0F0');
+  color: #333333;
+  text-align: center;
+  font-size: 13px; }
+
+.button--linkColor {
+  color: #0044cc; }
+
+.button--underLine {
+  text-decoration: underline; }
+
+.button--big {
+  font-size: 20px; }
+
+.button--small {
+  padding: 2px 5px;
+  font-size: 15px; }
+
+.button--primary {
+  text-shadow: rgba(0, 0, 0, 0.3) 1px 0 0;
+  color: #ffffff;
+  background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzk5MGMwMCIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzk5MGMwMCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #990c00), color-stop(100%, #990c00));
+  background: -moz-linear-gradient(#990c00, #990c00);
+  background: -webkit-linear-gradient(#990c00, #990c00);
+  background: linear-gradient(#990c00, #990c00);
+  *zoom: 1;
+  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#FF990C00', endColorstr='#FF990C00');
+  border: solid 1px #990000; }
+
+.body {
   font-family: Helvetica,Arial, Roboto, “Droid Sans”, “游ゴシック”, YuGothic,“ヒラギノ角ゴ ProN W3″,“Hiragino Kaku Gothic ProN”, “メイリオ”,Meiryo, sans-serif;
   background-color: #CCCCCC; }
+
+.body__backgroundWhite {
+  background-color: #FFFFFF; }
 
 .header {
   background-color: #990C00;
@@ -537,7 +587,9 @@ body {
 .headerReturn__submitButton {
   position: absolute;
   top: 17px;
-  right: 10px; }
+  right: 10px;
+  padding-left: 20px;
+  padding-right: 20px; }
 
 .card {
   background-color: #ffffff;
@@ -547,41 +599,6 @@ body {
   -moz-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
   -webkit-box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3); }
-
-.button {
-  display: inline-block;
-  vertical-align: middle;
-  *vertical-align: auto;
-  *zoom: 1;
-  *display: inline;
-  padding: 4px 10px;
-  border: solid 1px #999999;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  border-radius: 4px;
-  background: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4gPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJncmFkIiBncmFkaWVudFVuaXRzPSJvYmplY3RCb3VuZGluZ0JveCIgeDE9IjAuNSIgeTE9IjAuMCIgeDI9IjAuNSIgeTI9IjEuMCI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2YwZjBmMCIvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #f0f0f0));
-  background: -moz-linear-gradient(#ffffff, #f0f0f0);
-  background: -webkit-linear-gradient(#ffffff, #f0f0f0);
-  background: linear-gradient(#ffffff, #f0f0f0);
-  *zoom: 1;
-  filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0, startColorstr='#FFFFFFFF', endColorstr='#FFF0F0F0');
-  color: #333333;
-  text-align: center;
-  font-size: 13px; }
-
-.button--linkColor {
-  color: #0044cc; }
-
-.button--underLine {
-  text-decoration: underline; }
-
-.button--big {
-  font-size: 20px; }
-
-.button--small {
-  padding: 2px 5px;
-  font-size: 15px; }
 
 .dayList__header {
   padding: 2px 0;
@@ -678,21 +695,19 @@ body {
 .footer__copy {
   text-align: center; }
 
-.todoModify {
-  background-color: #ffffff; }
-  .todoModify input[type=text] {
-    border: 1px solid #e6e6e6;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    padding: 5px; }
-  .todoModify input[type=date] {
-    border: 1px solid #e6e6e6;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-    padding: 5px;
-    background-color: transparent; }
+.todoModify input[type=text] {
+  border: 1px solid #e6e6e6;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  padding: 5px; }
+.todoModify input[type=date] {
+  border: 1px solid #e6e6e6;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: transparent; }
 
 .todoModify__titleBlock,
 .todoModify__limitDateBlock,
@@ -701,6 +716,9 @@ body {
 .todoModify__parentTodoBlock {
   padding: 10px;
   border-bottom: 1px solid #E6E6E6; }
+
+.todoModify__submitBlock {
+  padding: 10px; }
 
 .todoModify__title {
   font-size: 20px;
@@ -732,3 +750,18 @@ body {
   width: 100%;
   padding-left: 20px;
   margin-top: 3px; }
+
+.todoModify__submitBlock {
+  text-align: center;
+  position: relative; }
+
+.todoModify__submitButton {
+  padding-left: 20px;
+  padding-right: 20px; }
+
+.todoModify__deleteButton {
+  position: absolute;
+  top: 15px;
+  right: 10px;
+  padding-left: 20px;
+  padding-right: 20px; }

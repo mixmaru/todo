@@ -11,7 +11,7 @@
         {#<script type="text/javascript" src="/js/common.js"></script>#}
     {% endblock %}
 </head>
-<body>
+<body class="body {% block bodyAddClassName %}{% endblock %}">
     {% block header %}
     <header class="header">
         <h1 class="header__siteName">マインTodo</h1>
