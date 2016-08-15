@@ -8,19 +8,21 @@
     </header>
 {% endblock %}
 {% block content %}
+    {{ dump(error_message) }}
+    {{ dump(input_data) }}
     <section class="todoModify">
         <form action="" method="post">
             <div class="todoModify__titleBlock">
                 <h2 class="todoModify__title">タイトル</h2>
-                <input class="todoModify__inputText" placeholder="インターステラーを観る" type="text" name="" value="{{ todo_data.title }}">
+                <input class="todoModify__inputText" placeholder="インターステラーを観る" type="text" name="todo_title" value="{% if input_data|length == 0 %}{{ todo_data.title }}{% else %}{{ input_data.todo_title }}{% endif %}">
             </div>
             <div class="todoModify__limitDateBlock">
                 <h2 class="todoModify__title">締切</h2>
-                <input class="todoModify__inputDate" type="date" name="" value="{{ todo_data.limit_date }}">
+                <input class="todoModify__inputDate" type="date" name="todo_limit_date" value="{{ todo_data.limit_date }}">
             </div>
             <div class="todoModify__doDateBlock">
                 <h2 class="todoModify__title">着手日</h2>
-                <input class="todoModify__inputDate" type="date" name="" value="{{ todo_data.do_date }}">
+                <input class="todoModify__inputDate" type="date" name="todo_do_date" value="{{ todo_data.do_date }}">
             </div>
             <div class="todoModify__projectBlock">
                 <h2 class="todoModify__title">プロジェクト</h2>
@@ -28,14 +30,14 @@
                     {% for project in all_project %}
                         <li class="todoModify__projectListList">
                             <label>
-                                <input type="radio" name="project" value="{{ project.id }}" {% if project.id == todo_data.project_id %}checked{% endif %}>
+                                <input type="radio" name="project_id" value="{{ project.id }}" {% if project.id == todo_data.project_id %}checked{% endif %}>
                                 {{ project.name }}
                             </label>
                         </li>
                     {% endfor %}
                     <li class="todoModify__projectListList">
                         <label>
-                            <input type="radio" name="project" value="-1">
+                            <input type="radio" name="project_id" value="-1">
                             新しいプロジェクト
                             <input class="todoModify__newProjectInputText" type="text" name="new_project_name" value="" placeholder="社運を賭けたプロジェクト">
                         </label>
@@ -52,6 +54,7 @@
                 <input class="todoModify__submitButton button button--big button--primary" type="submit" name="up" value="登録">
                 <input class="todoModify__deleteButton button" type="submit" name="delete" value="削除">
             </div>
+            <input type="hidden" name="todo_id" value="{{ todo_data.id }}">
         </form>
     </section>
 {% endblock %}

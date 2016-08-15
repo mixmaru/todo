@@ -84,58 +84,90 @@ class TodoListController
      */
     public function actionEdit(){
         $method = $this->request->getMethod();
-        if($method === "get"){
-            //編集入力フォーム
-            //バリデーション（入力を想定しているのはint id(必須ではない)）
-            $input_id = $this->request->get("id");
-            if($input_id){
-                if(!is_numeric($input_id)){
-                    //不正な値の場合は値を捨てる
-                    $input_id = false;
-                }
-            }
-            $todo_data = [];
-            if($input_id){
-                //データ取得
-                $todo_data = Todo::getTodo($input_id, 1);//todo: ログイン機能つけるまでuser_idは1に決め打ち
-            }
-            //すべてのプロジェクトデータを取得
-            $all_project = Project::getAll(1);
-            //Todoデータがあれば全てのTodoリストデータを取得
-            $all_todo_list = [];
-            if(!empty($todo_data)){
-                $all_todo_list = Todo::getTodoListByUser(1, $todo_data['project_id']);
-            }
-            $this->renderer->render("todo_modify", [
-                'page_title' => "Todo編集",
-                'todo_data' => $todo_data,
-                'all_project' => $all_project,
-                'all_todo_list' => $all_todo_list[0]['todo_data'],
-                'url' => $this->url,
-                'current' => $this->url['todo_edit'],
-            ]);
+        $error_message = [];
+        $input_data = [];
 
-        }elseif($method === "post"){
+
+        if($method === "post"){
             //編集実行
             $input_data = $this->request->post();
-            //バリデーション（入力を想定しているのはint id(任意), title(必須), limit_date(任意)）
-            $todo_obj = new Todo($id);
-            $todo_obj->dataLoad($input_data);
-            try{
-                $todo_obj->save();
-            }catch(Exeption $e){
-                $message = "データの変更に失敗しました";
-                //データ変更に失敗
-                $this->flash->set($message);
-                //ログへ記録
-                error_log($message);
+
+            if(isset($input_data['delete'])){
+                //指定Todoの削除
+                var_dump("削除");
+            }elseif(isset($input_data['up'])){
+                //プロジェクト新規作成の場合
+                if($input_data['project_id'] == -1){
+                    //新規プロジェクト作成
+                    var_dump("新規プロジェクト作成");
+                    $project_id = 2;
+                }else{
+                    $project_id = $input_data['project_id'];
+                }
+                if($input_data['todo_id'] == -1){
+                    //todo: 引数は$parent_path でなくて、$parent_idのほうがいいかも
+                    //新規追加
+                    //                    Todo::newTodo($title, $do_date, $limit_date, $parent_path, $project_id, $user_id);
+                    var_dump("新規追加");
+                }else{
+                    //内容編集
+                    var_dump("編集");
+                    $tmp_error_msg = Todo::modifyTodo($input_data['todo_id'],
+                                     $input_data['todo_title'],
+                                     $input_data['todo_do_date'],
+                                     $input_data['todo_limit_date'],
+                                     $project_id,
+                                     1);
+                    if(isset($tmp_error_msg['id'])) $error_message['todo_id'] = $tmp_error_msg['id'];
+                    if(isset($tmp_error_msg['title'])) $error_message['todo_title'] = $tmp_error_msg['title'];
+                    if(isset($tmp_error_msg['do_date'])) $error_message['todo_do_date'] = $tmp_error_msg['do_date'];
+                    if(isset($tmp_error_msg['limit_date'])) $error_message['todo_limit_date'] = $tmp_error_msg['limit_date'];
+                    if(isset($tmp_error_msg['project_id'])) $error_message['project_id'] = $tmp_error_msg['project_id'];
+                }
+
+            }else{
+                $this->renderer->renderError(400);
+                exit();
             }
             //一覧へリダイレクト
-            header('Location: /');
-            exit();
-        }else{
-            //404
+            if(count($error_message) <= 0){
+                //            header('Location: /?controller=TodoList&action=List');
+                var_dump("リダイレクト");
+                exit();
+            }
         }
+
+        //編集対象Todoデータを取得
+        $todo_data = [];
+        $input_id = $this->request->get("id");
+        if($input_id){
+            //todoデータ取得
+            $todo_data = Todo::getModifyTodoData($input_id, 1);//todo: ログイン機能つけるまでuser_idは1に決め打ち
+            if(count($todo_data['error_message']) > 0){
+                if(isset($todo_data['error_message']['user_id'])){
+                    //user_idがおかしい場合はエラー表示
+                    $this->renderer->renderError(400);
+                    exit();
+                }
+                if(isset($todo_data['error_message']['id'])){
+                    //input_idがおかしい場合は無視
+                    $todo_data = [];
+                }
+            }
+        }
+        //すべてのプロジェクトデータを取得
+        $all_project = Project::getAll(1);
+
+        //編集入力フォーム表示。
+        $this->renderer->render("todo_modify", [
+            'page_title' => "Todo編集",
+            'todo_data' => $todo_data['target_todo'],
+            'all_project' => $all_project,
+            'all_todo_list' => $todo_data['same_project_all_todo'],
+            'url' => $this->url,
+            'error_message' => $error_message,
+            'input_data' => $input_data,
+        ]);
     }
 
     /**

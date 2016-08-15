@@ -30,6 +30,14 @@ class Project extends BaseModel{
         return $ret_array;
     }
 
+    static public function getProject($id){
+        $sql = "SELECT * FROM project WHERE id = :id ";
+
+        new Project();
+
+        return self::$pdo->fetch($sql, ['id' => $id]);
+    }
+
     /**
      * sqlから取得したprojestデータの数値をint型に変換して返す
      *

@@ -10,25 +10,50 @@
 
 namespace models;
 
-
+use models\Project;
 
 class Todo extends BaseModel
 {
     /**
-     * todoのidに対応するTodoデータを返す。
+     * todoのidに対応する編集画面用Todoデータを返す。
      * 他のuserのTodoデータを取得しないように$user_idが必須
      *
      * @param $id
      * @param $user_id
      * @return array
      */
-    public static function getTodo($id, $user_id){
-        new Todo();
-        $sql = "SELECT * FROM todo WHERE id = :id AND user_id = :user_id";
-        $result = self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
-        //親idを取り出してデータとして持たせる
-        $result['parent_id'] = self::convertParentIdByPath($result['path']);
-        return self::getTodoDataFromRecord($result);
+    public static function getModifyTodoData($id, $user_id){
+        $ret_data = [
+            'target_todo' => [],
+            'same_project_all_todo' => [],
+            'error_message' => [],
+        ];
+
+        //バリデーション
+        if(!is_numeric($id)){
+            $ret_data['error_message']['id'] = "idが数値ではない";
+        }
+        if(!is_numeric($user_id)){
+            $ret_data['error_message']['user_id'] = "user_idが値ではない";
+        }
+        if(count($ret_data['error_message']) > 0){
+            return $ret_data;
+        }
+
+        $result = self::getTodo($id, $user_id);
+        if($result){
+            //親idを取り出してデータとして持たせる
+            $result['parent_id'] = self::convertParentIdByPath($result['path']);
+            $ret_data['target_todo'] = self::getTodoDataFromRecord($result);
+
+            //編集するTodoと同じプロジェクトに属するTodoデータを取得する
+            $record = self::getProjectTodoRecords($user_id, null, null, $result['project_id']);
+            if(count($record) > 0){
+                $all_todo_list = self::makeProjectTodoListDataFromRecords($record, true);
+                $ret_data['same_project_all_todo'] = $all_todo_list[0]['todo_data'];
+            }
+        }
+        return $ret_data;
     }
 
     /**
@@ -188,12 +213,63 @@ class Todo extends BaseModel
      * @param $title
      * @param $do_date
      * @param $limit_date
-     * @param $parent_path :親のpathであることに注意
      * @param $project_id
-     * @return bool
      * @throws \Exception
      */
-    static public function modifyTodo($id, $title, $do_date, $limit_date, $parent_path, $project_id){
+    static public function modifyTodo($id, $title, $do_date, $limit_date, $project_id, $user_id){
+        $error_msg = [];
+        //バリデーション
+        $target_todo = self::getTodo($id, $user_id);
+        if(empty($target_todo)){
+            $error_msg['id'] = "todoのidが不正です";
+        }
+        //$titleが指定されているか？
+        if(empty($title)){
+            $error_msg['title'] = "titleを入力してください";
+        }
+        //$do_dateがセットされていれば日付か
+        if(!empty($do_date) && $do_date !== date("Y-m-d", strtotime($do_date))){
+            $error_msg['do_date'] = "正しく日付指定してください";
+        }
+        //$limit_dateがセットされていれば日付か
+        if(!empty($limit_date) && $limit_date !== date("Y-m-d", strtotime($limit_date))){
+            $error_msg['limit_date'] = "正しく日付指定してください";
+        }
+        //$project_idのプロジェクトは$user_idのプロジェクトであるか？
+        $project_data = Project::getProject($project_id);
+        if($project_data['user_id'] != $user_id){
+            $error_msg['project_id'] = "プロジェクトを指定してください";
+        }
+
+        if(count($error_msg) > 0){
+            return $error_msg;
+        }
+
+        /*
+            //タイトルが入力されているか?
+            if(empty($input_data['todo_title'])){
+                $error_message['todo_title'] = "タイトルを入力してください";
+            }
+            //project_idに-1または存在するプロジェクトのidが指定されているか
+            $allow_project_ids = array_merge([-1], array_column($all_project, "id"));
+            if(!(isset($input_data['project_id']) && in_array($input_data['project_id'], $allow_project_ids))){
+                $error_message['project_id'] = "プロジェクトを指定してください";
+            }elseif($input_data['project_id'] == -1 && empty($input_data['new_project_name'])){
+                //project_idが-1の場合、new_project_nameが入力されているか？
+                $error_message['new_project_name'] = "新しいプロジェクト名を入力してください";
+            }
+            //parent_todo_idが-1または存在するTodoのidが指定されているか？
+            $allow_todo_ids = [-1, 1,2,3];
+            if(!(isset($input_data['parent_todo_id']) && in_array($input_data['parent_todo_id'], $all_todo_list))){
+                $error_message['parent_todo_id'] = "親Todoを指定してください";
+            }
+            upかdeleteのどちらかが入力されているか？
+            todo_idに-1以上の数値が入力されているか？
+            todo_idが-1でない場合、そのtodo_idのTodoデータのuser_idはログインuser_idと同じか？
+
+        */
+
+
         //入力値チェック
         $error_msg = false;
         //idの入力確認。タイトルの入力確認。$parent_pathの確認。
@@ -259,6 +335,19 @@ class Todo extends BaseModel
         $sql = "DELETE FROM todo WHERE id = :id ";
         new Todo();
         self::$pdo->execute($sql, [':id' => $todo_id]);
+    }
+
+    /**
+     * todo_idとuser_idから対応するtodoデータのレコードを返す
+     *
+     * @param $id
+     * @param $user_id
+     * @return array
+     */
+    static private function getTodo($id, $user_id){
+        new Todo();
+        $sql = "SELECT * FROM todo WHERE id = :id AND user_id = :user_id";
+        return self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
     }
 
     /**
