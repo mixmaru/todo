@@ -8,44 +8,65 @@
     </header>
 {% endblock %}
 {% block content %}
-    {{ dump(error_message) }}
-    {{ dump(input_data) }}
     <section class="todoModify">
         <form action="" method="post">
             <div class="todoModify__titleBlock">
                 <h2 class="todoModify__title">タイトル</h2>
-                <input class="todoModify__inputText" placeholder="インターステラーを観る" type="text" name="todo_title" value="{% if input_data|length == 0 %}{{ todo_data.title }}{% else %}{{ input_data.todo_title }}{% endif %}">
+                {% if error_message.todo_title %}
+                    <p class="todoModify__errorMessage">※{{ error_message.todo_title }}</p>
+                {% endif %}
+                <input class="todoModify__inputText" placeholder="インターステラーを観る" type="text" name="todo_title" value="{% if input_data.todo_title is null %}{{ todo_data.title }}{% else %}{{ input_data.todo_title }}{% endif %}">
             </div>
             <div class="todoModify__limitDateBlock">
                 <h2 class="todoModify__title">締切</h2>
-                <input class="todoModify__inputDate" type="date" name="todo_limit_date" value="{{ todo_data.limit_date }}">
+                {% if error_message.todo_limit_date %}
+                    <p class="todoModify__errorMessage">※{{ error_message.todo_limit_date }}</p>
+                {% endif %}
+                <input class="todoModify__inputDate" type="date" name="todo_limit_date" value="{% if input_data.todo_limit_date is null %}{{ todo_data.limit_date }}{% else %}{{ input_data.todo_limit_date }}{% endif %}">
             </div>
             <div class="todoModify__doDateBlock">
                 <h2 class="todoModify__title">着手日</h2>
-                <input class="todoModify__inputDate" type="date" name="todo_do_date" value="{{ todo_data.do_date }}">
+                {% if error_message.todo_do_date %}
+                    <p class="todoModify__errorMessage">※{{ error_message.todo_do_date }}</p>
+                {% endif %}
+                <input class="todoModify__inputDate" type="date" name="todo_do_date" value="{% if input_data.todo_do_date is null %}{{ todo_data.do_date }}{% else %}{{ input_data.todo_do_date }}{% endif %}">
             </div>
             <div class="todoModify__projectBlock">
                 <h2 class="todoModify__title">プロジェクト</h2>
+                {% if error_message.project_id %}
+                    <p class="todoModify__errorMessage">※{{ error_message.project_id }}</p>
+                {% endif %}
+                {% if error_message.new_project_name %}
+                    <p class="todoModify__errorMessage">※{{ error_message.new_project_name }}</p>
+                {% endif %}
                 <ul class="todoModify__projectListBlock">
+                    {% if input_data.project_id is null %}
+                        {% set selected_project_id = todo_data.project_id %}
+                    {% else %}
+                        {% set selected_project_id = input_data.project_id %}
+                    {% endif %}
                     {% for project in all_project %}
                         <li class="todoModify__projectListList">
                             <label>
-                                <input type="radio" name="project_id" value="{{ project.id }}" {% if project.id == todo_data.project_id %}checked{% endif %}>
+                                <input type="radio" name="project_id" value="{{ project.id }}" {% if project.id == selected_project_id %}checked{% endif %}>
                                 {{ project.name }}
                             </label>
                         </li>
                     {% endfor %}
                     <li class="todoModify__projectListList">
                         <label>
-                            <input type="radio" name="project_id" value="-1">
+                            <input type="radio" name="project_id" value="-1" {% if selected_project_id == -1 %}checked{% endif %}>
                             新しいプロジェクト
-                            <input class="todoModify__newProjectInputText" type="text" name="new_project_name" value="" placeholder="社運を賭けたプロジェクト">
+                            <input class="todoModify__newProjectInputText" type="text" name="new_project_name" value="{{ input_data.new_project_name }}" placeholder="社運を賭けたプロジェクト">
                         </label>
                     </li>
                 </ul>
             </div>
             <div class="todoModify__parentTodoBlock">
                 <h2 class="todoModify__title">親作業</h2>
+                {% if error_message.parent_todo_id %}
+                    <p class="todoModify__errorMessage">※{{ error_message.parent_todo_id }}</p>
+                {% endif %}
                 {% for todo_root in all_todo_list %}
                     {% include 'parts/todo_list_radio.html' with {'all_todo_list': todo_root.child, 'target_todo': todo_data} only %}
                 {% endfor %}
