@@ -39,6 +39,57 @@ class Project extends BaseModel{
     }
 
     /**
+     * プロジェクトの新規登録。
+     * view_orderは既存の最大値+100に設定される
+     *
+     * @param $name プロジェクト名。文字列。空文字NG
+     * @param $user_id ユーザーid
+     * @return array
+     */
+    static public function newProject($name, $user_id){
+        $ret_array = [
+            'project_data' => [],   //新規登録したprojectデータをいれる
+            'error_message' => [],  //引数名をキーとしてエラーメッセージをいれる
+        ];
+
+        //バリデーション
+        $error_message = [];
+        if(!(is_string($name) && $name != "")){
+            $error_message['name'] = "プロジェクト名を入力してください";
+        }
+        $max_view_order_sql = "SELECT MAX(view_order) as max_view_order FROM project WHERE user_id = :user_id GROUP BY user_id ";
+        new Project();
+        $result = self::$pdo->fetch($max_view_order_sql, [':user_id' => $user_id]);
+        if(!$result){
+            $error_message['user_id'] = "user_idが存在しません";
+        }
+        if(count($error_message) > 0){
+            $ret_array['error_message'] = $error_message;
+            return $ret_array;
+        }
+
+        //新規登録処理
+        $max_view_order = $result['max_view_order'];
+        $view_order = $max_view_order + 100;
+        $add_sql = "INSERT INTO project (name, view_order, user_id, created) VALUE (:name, :view_order, :user_id, :created) ";
+        //トランザクションスタート
+        self::$pdo->beginTransaction();
+        self::$pdo->execute($add_sql, [
+            ':name' => $name,
+            ':view_order' => $view_order,
+            ':user_id' => $user_id,
+            ':created' => date("Y-m-d H:i:s"),
+        ]);
+        //登録idを取得
+        $insert_id = self::$pdo->lastInsertId('id');
+        //コミット
+        self::$pdo->commit();
+        $get_insert_data_sql = "SELECT * FROM project WHERE id = :id ";
+        $ret_array['project_data'] = self::$pdo->fetch($get_insert_data_sql, [':id' => $insert_id]);
+        return $ret_array;
+    }
+
+    /**
      * sqlから取得したprojestデータの数値をint型に変換して返す
      *
      * @param $record

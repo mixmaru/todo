@@ -87,22 +87,29 @@ class TodoListController
         $error_message = [];
         $input_data = [];
 
-
         if($method === "post"){
-            //編集実行
+            //入力値の取得
             $input_data = $this->request->post();
 
             if(isset($input_data['delete'])){
                 //指定Todoの削除
                 var_dump("削除");
             }elseif(isset($input_data['up'])){
-                //プロジェクト新規作成の場合
                 if($input_data['project_id'] == -1){
                     //新規プロジェクト作成
-                    var_dump("新規プロジェクト作成");
-                    $project_id = 2;
-                }else{
-                    $project_id = $input_data['project_id'];
+                    $result = Project::newProject($input_data['new_project_name'], 1);//todo:ログインシステム実装するまでuser_idを1に決め打ち
+                    if(count($result['error_message']) > 0){
+                        //新規プロジェクト作成失敗(バリデートエラー)
+                        if(isset($result['error_message']['user_id'])){
+                            $this->renderer->renderError(500);
+                            return;
+                        }
+                        if(isset($result['error_message']['name'])) $error_message['new_project_name'] = $result['error_message']['name'];
+                    }else{
+                        //新規プロジェクト作成成功
+                        $input_data['project_id'] = $result['project_data']['id'];
+                        unset($input_data['new_project_name']);
+                    }
                 }
                 if($input_data['todo_id'] == -1){
                     //todo: 引数は$parent_path でなくて、$parent_idのほうがいいかも
@@ -116,13 +123,15 @@ class TodoListController
                                      $input_data['todo_title'],
                                      $input_data['todo_do_date'],
                                      $input_data['todo_limit_date'],
-                                     $project_id,
+                                     $input_data['project_id'],
                                      1);
                     if(isset($tmp_error_msg['id'])) $error_message['todo_id'] = $tmp_error_msg['id'];
                     if(isset($tmp_error_msg['title'])) $error_message['todo_title'] = $tmp_error_msg['title'];
                     if(isset($tmp_error_msg['do_date'])) $error_message['todo_do_date'] = $tmp_error_msg['do_date'];
                     if(isset($tmp_error_msg['limit_date'])) $error_message['todo_limit_date'] = $tmp_error_msg['limit_date'];
-                    if(isset($tmp_error_msg['project_id'])) $error_message['project_id'] = $tmp_error_msg['project_id'];
+                    if($input_data['project_id'] != -1){
+                        if(isset($tmp_error_msg['project_id'])) $error_message['project_id'] = $tmp_error_msg['project_id'];
+                    }
                 }
 
             }else{
