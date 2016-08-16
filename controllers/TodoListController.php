@@ -118,7 +118,6 @@ class TodoListController
                     var_dump("新規追加");
                 }else{
                     //内容編集
-                    var_dump("編集");
                     $tmp_error_msg = Todo::modifyTodo($input_data['todo_id'],
                                      $input_data['todo_title'],
                                      $input_data['todo_do_date'],

@@ -245,72 +245,31 @@ class Todo extends BaseModel
             return $error_msg;
         }
 
-        /*
-            //タイトルが入力されているか?
-            if(empty($input_data['todo_title'])){
-                $error_message['todo_title'] = "タイトルを入力してください";
-            }
-            //project_idに-1または存在するプロジェクトのidが指定されているか
-            $allow_project_ids = array_merge([-1], array_column($all_project, "id"));
-            if(!(isset($input_data['project_id']) && in_array($input_data['project_id'], $allow_project_ids))){
-                $error_message['project_id'] = "プロジェクトを指定してください";
-            }elseif($input_data['project_id'] == -1 && empty($input_data['new_project_name'])){
-                //project_idが-1の場合、new_project_nameが入力されているか？
-                $error_message['new_project_name'] = "新しいプロジェクト名を入力してください";
-            }
-            //parent_todo_idが-1または存在するTodoのidが指定されているか？
-            $allow_todo_ids = [-1, 1,2,3];
-            if(!(isset($input_data['parent_todo_id']) && in_array($input_data['parent_todo_id'], $all_todo_list))){
-                $error_message['parent_todo_id'] = "親Todoを指定してください";
-            }
-            upかdeleteのどちらかが入力されているか？
-            todo_idに-1以上の数値が入力されているか？
-            todo_idが-1でない場合、そのtodo_idのTodoデータのuser_idはログインuser_idと同じか？
-
-        */
-
-
-        //入力値チェック
-        $error_msg = false;
-        //idの入力確認。タイトルの入力確認。$parent_pathの確認。
-        if(empty($id) || empty($title) || empty($parent_path)){
-            $error_msg .= "id, title, parent_pathは必須引数です\n";
-        }
-        //日付が正しいか確認
-        foreach(['do_date', 'limit_date'] as $val_name){
-            if(isset($$val_name)){
-                if($$val_name !== date("Y-m-d", strtotime($$val_name))){
-                    $error_msg .= "${val_name}の日付指定を正しく行ってください\n";
-                }
-            }
-        }
-        //入力が正しくなければエラー
-        if($error_msg){
-            throw new \Exception($error_msg);
-        }
-
         new Todo();
-
-        //project_rootは変更できないようにする
+        //project_rootは変更できないようにする//todo: project_rootの判断を文字列で行っている。tableにカラムを追加してパラメーターで判断するようにしたほうがいい
         $project_root_check_sql = "SELECT title FROM todo WHERE id = :id ";
-        $result = self::$pdo->fetch($project_root_check_sql);
+        $result = self::$pdo->fetch($project_root_check_sql, [':id' => $id]);
         if($result['title'] == "project_root"){
             throw new \Exception("project_rootは変更できません");
         }
 
+        //project_idからproject_rootを取得する。
+        $project_root_id = $project_data['root_todo_id'];
+
         //内容保存処理
         $sql = "UPDATE todo SET title=:title, do_date=:do_date, limit_date=:limit_date, path=:path, project_id=:project_id "
-              ."WHERE id = :id";
+              ."WHERE id = :id AND user_id = :user_id";
         $params = [
             ':id' => $id,
             ':title' => $title,
             ':do_date' => $do_date,
             ':limit_date' => $limit_date,
-            ':path' => $parent_path."${id}/",
+            ':path' => "/${project_root_id}/${id}/",
             ':project_id' => $project_id,
+            ':user_id' => $user_id,
         ];
         self::$pdo->execute($sql, $params);
-        return true;
+        return $error_msg;
     }
 
     /**
