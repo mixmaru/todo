@@ -69,19 +69,33 @@ class Project extends BaseModel{
         }
 
         //新規登録処理
-        $max_view_order = $result['max_view_order'];
-        $view_order = $max_view_order + 100;
-        $add_sql = "INSERT INTO project (name, view_order, user_id, created) VALUE (:name, :view_order, :user_id, :created) ";
         //トランザクションスタート
         self::$pdo->beginTransaction();
+
+        //プロジェクト新規登録
+        $max_view_order = $result['max_view_order'];
+        $view_order = $max_view_order + 100;
+        $add_sql = "INSERT INTO project (name, view_order, user_id, root_todo_id, created) VALUE (:name, :view_order, :user_id, :root_todo_id, :created) ";
         self::$pdo->execute($add_sql, [
             ':name' => $name,
             ':view_order' => $view_order,
             ':user_id' => $user_id,
+            ':root_todo_id' => 0,//すぐあとで登録するproject_todo_idが後ではいる
             ':created' => date("Y-m-d H:i:s"),
         ]);
-        //登録idを取得
+        //プロジェクト登録idを取得
         $insert_id = self::$pdo->lastInsertId('id');
+
+        //project_rootになるTodoを作成し、そのidを習得
+        $root_todo_id = Todo::newRootTodo($insert_id, $user_id);
+
+        //root_todo_idをプロジェクトに登録
+        $update_project_sql = "UPDATE project SET root_todo_id = :root_todo_id WHERE id = :id ";
+        self::$pdo->execute($update_project_sql, [
+            ':root_todo_id' => $root_todo_id,
+            ':id' => $insert_id,
+        ]);
+
         //コミット
         self::$pdo->commit();
         $get_insert_data_sql = "SELECT * FROM project WHERE id = :id ";

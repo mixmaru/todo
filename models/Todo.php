@@ -296,6 +296,31 @@ class Todo extends BaseModel
         self::$pdo->execute($sql, [':id' => $todo_id]);
     }
 
+
+    /**
+     * project_root_todoを作成して、そのidを返す
+     * @param $project_id
+     * @param $user_id
+     * @return
+     */
+    static public function newRootTodo($project_id, $user_id){
+        new Todo();
+        $get_next_insert_id_sql = "SHOW TABLE STATUS LIKE 'todo' ";
+        $result = self::$pdo->fetch($get_next_insert_id_sql);
+        $next_insert_id = $result['Auto_increment'];
+
+        $make_root_todo_sql = "INSERT INTO todo (id, title, path, project_id, user_id, created) VALUE (:id, :title, :path, :project_id, :user_id, :created) ";
+        self::$pdo->execute($make_root_todo_sql, [
+            ':id' => $next_insert_id,
+            ':title' => "project_root",
+            ':path' => "/".$next_insert_id."/",
+            ':project_id' => $project_id,
+            ':user_id' => $user_id,
+            ':created' => date("Y-m-d H:i:s"),
+        ]);
+        return $next_insert_id;
+    }
+
     /**
      * todo_idとuser_idから対応するtodoデータのレコードを返す
      *
