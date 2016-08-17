@@ -44,7 +44,7 @@ class Todo extends BaseModel
         if($result){
             //親idを取り出してデータとして持たせる
             $result['parent_id'] = self::convertParentIdByPath($result['path']);
-            $ret_data['target_todo'] = self::getTodoDataFromRecord($result);
+            $ret_data['target_todo'] = $result;
 
             //編集するTodoと同じプロジェクトに属するTodoデータを取得する
             $record = self::getProjectTodoRecords($user_id, null, null, $result['project_id']);
@@ -331,7 +331,8 @@ class Todo extends BaseModel
     static private function getTodo($id, $user_id){
         new Todo();
         $sql = "SELECT * FROM todo WHERE id = :id AND user_id = :user_id";
-        return self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
+        $todo_data = self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
+        return self::castIntTodoRecord($todo_data);
     }
 
     /**
@@ -399,7 +400,7 @@ class Todo extends BaseModel
             $current_id = array_pop($path_array);
             $parent_id = array_pop($path_array);
             $tmp_list_data[$current_id] = [
-                'data' => self::getTodoDataFromRecord($todo_data),
+                'data' => self::castIntTodoRecord($todo_data),
                 'child' => [],
 //                'parent' => null,
             ];
@@ -416,7 +417,7 @@ class Todo extends BaseModel
     private static function makeListTodoData($records){
         $ret_array = [];
         foreach($records as $todo_data){
-            $ret_array[] = self::getTodoDataFromRecord($todo_data);
+            $ret_array[] = self::castIntTodoRecord($todo_data);
         }
         return $ret_array;
     }
@@ -440,12 +441,12 @@ class Todo extends BaseModel
     }
 
     /**
-     * getProjectTodoRecordsで帰ってくるレコードデータ配列の1レコードデータから、Todoデータを返す
+     * Todoテーブルから取得するレコード配列を渡すと、数値カラムの値はint型に変換して返す
      *
-     * @param $record: getProjectTodoRecordsで帰ってくるレコードデータ配列の1レコードデータ
+     * @param $record: Todoテーブル配列の1レコードデータ
      * @return array
      */
-    private static function getTodoDataFromRecord($record){
+    private static function castIntTodoRecord($record){
         foreach($record as $key => &$value){
             if(in_array($key, ['id', 'project_id', 'user_id'])){
                 $value = (int) $value;
