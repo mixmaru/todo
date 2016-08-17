@@ -25,7 +25,7 @@ class Project extends BaseModel{
 
         $ret_array = [];
         foreach(self::$pdo->fetchAll($sql, ['user_id' => $user_id]) as $record){
-            $ret_array[] = self::getProjectDataFromRecord($record);
+            $ret_array[] = self::castIntProjectRecord($record);
         }
         return $ret_array;
     }
@@ -104,20 +104,17 @@ class Project extends BaseModel{
     }
 
     /**
-     * sqlから取得したprojestデータの数値をint型に変換して返す
+     * Projectテーブルから取得するレコード配列を渡すと、数値カラムの値はint型に変換して返す
      *
-     * @param $record
+     * @param $record: Projectテーブル配列の1レコードデータ
      * @return array
      */
-    static private function getProjectDataFromRecord($record){
-        $ret_array = [
-            'id'            => (int) $record['id'],
-            'name'          => $record['name'],
-            'view_order'    => $record['view_order'],
-            'user_id'       => $record['user_id'],
-            'created'       => $record['created'],
-            'modified'      => $record['modified'],
-        ];
-        return $ret_array;
+    static private function castIntProjectRecord($record){
+        foreach($record as $key => &$value){
+            if(in_array($key, ['id', 'user_id'])){
+                $value = (int) $value;
+            }
+        }
+        return $record;
     }
 }
