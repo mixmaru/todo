@@ -30,12 +30,18 @@ class Project extends BaseModel{
         return $ret_array;
     }
 
-    static public function getProject($id){
-        $sql = "SELECT * FROM project WHERE id = :id ";
+    static public function getProject($ids){
+        $sql = "SELECT * FROM project WHERE id ";
 
         new Project();
-
-        return self::$pdo->fetch($sql, ['id' => $id]);
+        if(is_array($ids)){
+            $clause = implode(',', array_fill(0, count($ids), '?'));
+            $sql .= "IN (".$clause.") ";
+            return self::$pdo->fetchAll($sql, $ids);
+        }else{
+            $sql .= "= ?";
+            return self::$pdo->fetch($sql, [$ids]);
+        }
     }
 
     /**
