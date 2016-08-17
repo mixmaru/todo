@@ -15,48 +15,6 @@ use models\Project;
 class Todo extends BaseModel
 {
     /**
-     * todoのidに対応する編集画面用Todoデータを返す。
-     * 他のuserのTodoデータを取得しないように$user_idが必須
-     *
-     * @param $id
-     * @param $user_id
-     * @return array
-     */
-    public static function getModifyTodoData($id, $user_id){
-        $ret_data = [
-            'target_todo' => [],
-            'same_project_all_todo' => [],
-            'error_message' => [],
-        ];
-
-        //バリデーション
-        if(!is_numeric($id)){
-            $ret_data['error_message']['id'] = "idが数値ではない";
-        }
-        if(!is_numeric($user_id)){
-            $ret_data['error_message']['user_id'] = "user_idが値ではない";
-        }
-        if(count($ret_data['error_message']) > 0){
-            return $ret_data;
-        }
-
-        $result = self::getTodo($id, $user_id);
-        if($result){
-            //親idを取り出してデータとして持たせる
-            $result['parent_id'] = self::convertParentIdByPath($result['path']);
-            $ret_data['target_todo'] = $result;
-
-            //編集するTodoと同じプロジェクトに属するTodoデータを取得する
-            $record = self::getProjectTodoRecords($user_id, null, null, $result['project_id']);
-            if(count($record) > 0){
-                $all_todo_list = self::makeProjectTodoListDataFromRecords($record, true);
-                $ret_data['same_project_all_todo'] = $all_todo_list[0]['todo_data'];
-            }
-        }
-        return $ret_data;
-    }
-
-    /**
      * 全てのプロジェクトデータと、それに関連する全てのTodoデータを取得
      *
      * 返却データの形
@@ -137,6 +95,25 @@ class Todo extends BaseModel
                     'date' => $tmp_date,
                     'project_todo_data' => self::makeProjectTodoListDataFromRecords($tmp_records, false),
                 ];
+        }
+        return $ret_array;
+    }
+
+    /**
+     * プロジェクトid配列から、すべてのTodoデータを返す
+     *
+     * @param array $project_ids
+     * @return array
+     */
+    public static function getTodoByProjectId(array $project_ids){
+        $clause = implode(',', array_fill(0, count($project_ids), '?'));
+        $sql = "SELECT * FROM todo WHERE project_id IN (".$clause.") "
+              ."ORDER BY (LENGTH(path) - LENGTH(REPLACE(path, '/', '')) -1) ASC ";
+
+        new Todo();
+        $ret_array = [];
+        foreach(self::$pdo->fetchAll($sql, $project_ids) as $todo_record){
+            $ret_array[] = self::castIntTodoRecord($todo_record);
         }
         return $ret_array;
     }
@@ -328,11 +305,15 @@ class Todo extends BaseModel
      * @param $user_id
      * @return array
      */
-    static private function getTodo($id, $user_id){
+    static public function getTodo($id, $user_id){
         new Todo();
         $sql = "SELECT * FROM todo WHERE id = :id AND user_id = :user_id";
         $todo_data = self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
-        return self::castIntTodoRecord($todo_data);
+        if($todo_data){
+            return self::castIntTodoRecord($todo_data);
+        }else{
+            return false;
+        }
     }
 
     /**
@@ -392,7 +373,7 @@ class Todo extends BaseModel
      * @param $records       :同一プロジェクトの深さ順にならんだTodoレコード配列
      * @return array
      */
-    private static function makeTreeData($records){
+    public static function makeTreeData($records){
         $ret_tree_data = [];//返却用Tree構造データ
         $tmp_list_data = [];//Treeデータ作成に必要なlistデータ
         foreach($records as $todo_data){

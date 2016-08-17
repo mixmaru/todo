@@ -146,21 +146,15 @@ class TodoListController
         }
 
         //編集対象Todoデータを取得
-        $todo_data = [];
+        $target_todo = [];
+        $same_project_all_todo = [];
         $input_id = $this->request->get("id");
         if($input_id){
             //todoデータ取得
-            $todo_data = Todo::getModifyTodoData($input_id, 1);//todo: ログイン機能つけるまでuser_idは1に決め打ち
-            if(count($todo_data['error_message']) > 0){
-                if(isset($todo_data['error_message']['user_id'])){
-                    //user_idがおかしい場合はエラー表示
-                    $this->renderer->renderError(400);
-                    exit();
-                }
-                if(isset($todo_data['error_message']['id'])){
-                    //input_idがおかしい場合は無視
-                    $todo_data = [];
-                }
+            $target_todo = Todo::getTodo($input_id, 1);//todo: ログイン機能つけるまでuser_idは1に決め打ち
+            if($target_todo){
+                $project_and_all_todos = Project::getProjectWithTodo([$target_todo['project_id']], true);
+                $same_project_all_todo = $project_and_all_todos[0]['todo'];
             }
         }
         //すべてのプロジェクトデータを取得
@@ -169,9 +163,9 @@ class TodoListController
         //編集入力フォーム表示。
         $this->renderer->render("todo_modify", [
             'page_title' => "Todo編集",
-            'todo_data' => $todo_data['target_todo'],
+            'todo_data' => $target_todo,
             'all_project' => $all_project,
-            'all_todo_list' => $todo_data['same_project_all_todo'],
+            'all_todo_list' => $same_project_all_todo,
             'url' => $this->url,
             'error_message' => $error_message,
             'input_data' => $input_data,

@@ -37,10 +37,14 @@ class Project extends BaseModel{
         if(is_array($ids)){
             $clause = implode(',', array_fill(0, count($ids), '?'));
             $sql .= "IN (".$clause.") ";
-            return self::$pdo->fetchAll($sql, $ids);
+            $res = self::$pdo->fetchAll($sql, $ids);
+            foreach($res as &$record){
+                $record = self::castIntProjectRecord($record);
+            }
+            return $res;
         }else{
             $sql .= "= ?";
-            return self::$pdo->fetch($sql, [$ids]);
+            return self::castIntProjectRecord(self::$pdo->fetch($sql, [$ids]));
         }
     }
 
@@ -122,5 +126,50 @@ class Project extends BaseModel{
             }
         }
         return $record;
+    }
+
+    /**
+     * user_idを渡すと、全てのプロジェクトデータを関連するTodoデータとともに返す。
+     * 返却値：
+     * [
+     *      [
+     *          'project' => [プロジェクトデータ(配列)],
+     *          'todo' => [todoデータ(配列)],
+     *      ],
+     *      [
+     *          'project' => [プロジェクトデータ(配列)],
+     *          'todo' => [todoデータ(配列)],
+     *      ],
+     *      …
+     * ]
+     *
+     * @param array $project_ids
+     * @param bool $tree
+     * @return array
+     */
+    public static function getProjectWithTodo(array $project_ids, $tree = false){
+        $ret_data = [];
+
+        //プロジェクトデータ取得
+        $projects = self::getProject($project_ids);
+
+        //Todoデータ取得(project_idをkeyにした配列にする)
+        $todos = [];
+        foreach(Todo::getTodoByProjectId($project_ids) as $todo){
+            $todos[$todo['project_id']][] = $todo;
+        }
+
+
+        //返却データ作成
+        foreach($projects as $project){
+            $tmp_data = [
+                'project' => $project,
+                'todo' => [],
+            ];
+            //todoデータをのせる
+            $tmp_data['todo'] = ($tree) ? Todo::makeTreeData($todos[$project['id']]) : $todos[$project['id']];
+            $ret_data[] = $tmp_data;
+        }
+        return $ret_data;
     }
 }
