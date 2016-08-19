@@ -23,8 +23,8 @@ class Project extends BaseModel{
 
         new Project();
 
-        $ret_array = [];
-        foreach(self::$pdo->fetchAll($sql, ['user_id' => $user_id]) as $record){
+        $ret_array = array();
+        foreach(self::$pdo->fetchAll($sql, array('user_id' => $user_id)) as $record){
             $ret_array[] = self::castIntProjectRecord($record);
         }
         return $ret_array;
@@ -44,7 +44,7 @@ class Project extends BaseModel{
             return $res;
         }else{
             $sql .= "= ?";
-            return self::castIntProjectRecord(self::$pdo->fetch($sql, [$ids]));
+            return self::castIntProjectRecord(self::$pdo->fetch($sql, array($ids)));
         }
     }
 
@@ -57,19 +57,19 @@ class Project extends BaseModel{
      * @return array
      */
     static public function newProject($name, $user_id){
-        $ret_array = [
-            'project_data' => [],   //新規登録したprojectデータをいれる
-            'error_message' => [],  //引数名をキーとしてエラーメッセージをいれる
-        ];
+        $ret_array = array(
+            'project_data' => array(),   //新規登録したprojectデータをいれる
+            'error_message' => array(),  //引数名をキーとしてエラーメッセージをいれる
+        );
 
         //バリデーション
-        $error_message = [];
+        $error_message = array();
         if(!(is_string($name) && $name != "")){
             $error_message['name'] = "プロジェクト名を入力してください";
         }
         $max_view_order_sql = "SELECT MAX(view_order) as max_view_order FROM project WHERE user_id = :user_id GROUP BY user_id ";
         new Project();
-        $result = self::$pdo->fetch($max_view_order_sql, [':user_id' => $user_id]);
+        $result = self::$pdo->fetch($max_view_order_sql, array(':user_id' => $user_id));
         if(!$result){
             $error_message['user_id'] = "user_idが存在しません";
         }
@@ -86,13 +86,13 @@ class Project extends BaseModel{
         $max_view_order = $result['max_view_order'];
         $view_order = $max_view_order + 100;
         $add_sql = "INSERT INTO project (name, view_order, user_id, root_todo_id, created) VALUE (:name, :view_order, :user_id, :root_todo_id, :created) ";
-        self::$pdo->execute($add_sql, [
+        self::$pdo->execute($add_sql, array(
             ':name' => $name,
             ':view_order' => $view_order,
             ':user_id' => $user_id,
             ':root_todo_id' => 0,//すぐあとで登録するproject_todo_idが後ではいる
             ':created' => date("Y-m-d H:i:s"),
-        ]);
+        ));
         //プロジェクト登録idを取得
         $insert_id = self::$pdo->lastInsertId('id');
 
@@ -101,15 +101,15 @@ class Project extends BaseModel{
 
         //root_todo_idをプロジェクトに登録
         $update_project_sql = "UPDATE project SET root_todo_id = :root_todo_id WHERE id = :id ";
-        self::$pdo->execute($update_project_sql, [
+        self::$pdo->execute($update_project_sql, array(
             ':root_todo_id' => $root_todo_id,
             ':id' => $insert_id,
-        ]);
+        ));
 
         //コミット
         self::$pdo->commit();
         $get_insert_data_sql = "SELECT * FROM project WHERE id = :id ";
-        $ret_array['project_data'] = self::$pdo->fetch($get_insert_data_sql, [':id' => $insert_id]);
+        $ret_array['project_data'] = self::$pdo->fetch($get_insert_data_sql, array(':id' => $insert_id));
         return $ret_array;
     }
 
@@ -121,7 +121,7 @@ class Project extends BaseModel{
      */
     static private function castIntProjectRecord($record){
         foreach($record as $key => &$value){
-            if(in_array($key, ['id', 'user_id'])){
+            if(in_array($key, array('id', 'user_id'))){
                 $value = (int) $value;
             }
         }
@@ -148,13 +148,13 @@ class Project extends BaseModel{
      * @return array
      */
     public static function getProjectWithTodo(array $project_ids, $tree = false){
-        $ret_data = [];
+        $ret_data = array();
 
         //プロジェクトデータ取得
         $projects = self::getProject($project_ids);
 
         //Todoデータ取得(project_idをkeyにした配列にする)
-        $todos = [];
+        $todos = array();
         foreach(Todo::getTodoByProjectId($project_ids) as $todo){
             $todos[$todo['project_id']][] = $todo;
         }
@@ -162,10 +162,10 @@ class Project extends BaseModel{
 
         //返却データ作成
         foreach($projects as $project){
-            $tmp_data = [
+            $tmp_data = array(
                 'project' => $project,
-                'todo' => [],
-            ];
+                'todo' => array(),
+            );
             //todoデータをのせる
             $tmp_data['todo'] = ($tree) ? Todo::makeTreeData($todos[$project['id']]) : $todos[$project['id']];
             $ret_data[] = $tmp_data;

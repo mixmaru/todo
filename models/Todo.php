@@ -36,7 +36,7 @@ class Todo extends BaseModel
     public static function getTodoListByUser($user_id, $project_id = null){
         $records = self::getProjectTodoRecords($user_id, null, null, $project_id);
         if(count($records) == 0){
-            return [];
+            return array();
         }
         return self::makeProjectTodoListDataFromRecords($records, true);
     }
@@ -71,30 +71,30 @@ class Todo extends BaseModel
         };
         $records = self::getProjectTodoRecords($user_id, $start_date, $limit_date);
         if(count($records) == 0){
-            return [];
+            return array();
         }
-        $ret_array = [];
+        $ret_array = array();
         $tmp_date = $resolveDate($records[0]['do_date'], $records[0]['limit_date']);
-        $tmp_records = [];
+        $tmp_records = array();
         foreach($records as $record){
             $date = $resolveDate($record['do_date'], $record['limit_date']);
             if($tmp_date != $date){
                 //ためていたデータで配列を作り、ためていたデータを初期化
-                $ret_array[] = [
+                $ret_array[] = array(
                     'date' => $tmp_date,
                     'project_todo_data' => self::makeProjectTodoListDataFromRecords($tmp_records, false),
-                ];
+                );
                 $tmp_date = $resolveDate($record['do_date'], $record['limit_date']);
-                $tmp_records = [];
+                $tmp_records = array();
             }
             $tmp_records[] = $record;
         }
         //バッファがあればそのデータ配列を作り、追加する
         if(count($tmp_records) > 0){
-                $ret_array[] = [
+                $ret_array[] = array(
                     'date' => $tmp_date,
                     'project_todo_data' => self::makeProjectTodoListDataFromRecords($tmp_records, false),
-                ];
+                );
         }
         return $ret_array;
     }
@@ -111,7 +111,7 @@ class Todo extends BaseModel
               ."ORDER BY (LENGTH(path) - LENGTH(REPLACE(path, '/', '')) -1) ASC ";
 
         new Todo();
-        $ret_array = [];
+        $ret_array = array();
         foreach(self::$pdo->fetchAll($sql, $project_ids) as $todo_record){
             $ret_array[] = self::castIntTodoRecord($todo_record);
         }
@@ -138,7 +138,7 @@ class Todo extends BaseModel
         }
         //チェックが必要なものはチェックする
         //日付が正しいか確認
-        foreach(['do_date', 'limit_date'] as $val_name){
+        foreach(array('do_date', 'limit_date') as $val_name){
             if(isset($$val_name)){
                 if($$val_name !== date("Y-m-d", strtotime($$val_name))){
                     $error_msg .= "${val_name}の日付指定を正しく行ってください\n";
@@ -165,7 +165,7 @@ class Todo extends BaseModel
         //保存用sqlを作成
         $sql = "INSERT INTO todo (title, do_date, limit_date, is_done, path, project_id, user_id, created) "
               ."VALUES (:title, :do_date, :limit_date, :is_done, :path, :project_id, :user_id, :created)";
-        $params = [
+        $params = array(
             ':title' => $title,
             ':do_date' => $do_date,
             ':limit_date' => $limit_date,
@@ -174,7 +174,7 @@ class Todo extends BaseModel
             ':project_id' => $project_id,
             ':user_id' => $user_id,
             ':created' => date("Y-m-d H:i:s"),
-        ];
+        );
         //sqlを実行
         self::$pdo->execute($sql, $params);
         //コミット
@@ -194,7 +194,7 @@ class Todo extends BaseModel
      * @throws \Exception
      */
     static public function modifyTodo($id, $title, $do_date, $limit_date, $project_id, $user_id){
-        $error_msg = [];
+        $error_msg = array();
         //バリデーション
         $target_todo = self::getTodo($id, $user_id);
         if(empty($target_todo)){
@@ -225,7 +225,7 @@ class Todo extends BaseModel
         new Todo();
         //project_rootは変更できないようにする//todo: project_rootの判断を文字列で行っている。tableにカラムを追加してパラメーターで判断するようにしたほうがいい
         $project_root_check_sql = "SELECT title FROM todo WHERE id = :id ";
-        $result = self::$pdo->fetch($project_root_check_sql, [':id' => $id]);
+        $result = self::$pdo->fetch($project_root_check_sql, array(':id' => $id));
         if($result['title'] == "project_root"){
             throw new \Exception("project_rootは変更できません");
         }
@@ -236,7 +236,7 @@ class Todo extends BaseModel
         //内容保存処理
         $sql = "UPDATE todo SET title=:title, do_date=:do_date, limit_date=:limit_date, path=:path, project_id=:project_id "
               ."WHERE id = :id AND user_id = :user_id";
-        $params = [
+        $params = array(
             ':id' => $id,
             ':title' => $title,
             ':do_date' => $do_date,
@@ -244,7 +244,7 @@ class Todo extends BaseModel
             ':path' => "/${project_root_id}/${id}/",
             ':project_id' => $project_id,
             ':user_id' => $user_id,
-        ];
+        );
         self::$pdo->execute($sql, $params);
         return $error_msg;
     }
@@ -270,7 +270,7 @@ class Todo extends BaseModel
     static public function deleteTodo($todo_id){
         $sql = "DELETE FROM todo WHERE id = :id ";
         new Todo();
-        self::$pdo->execute($sql, [':id' => $todo_id]);
+        self::$pdo->execute($sql, array(':id' => $todo_id));
     }
 
 
@@ -287,14 +287,14 @@ class Todo extends BaseModel
         $next_insert_id = $result['Auto_increment'];
 
         $make_root_todo_sql = "INSERT INTO todo (id, title, path, project_id, user_id, created) VALUE (:id, :title, :path, :project_id, :user_id, :created) ";
-        self::$pdo->execute($make_root_todo_sql, [
+        self::$pdo->execute($make_root_todo_sql, array(
             ':id' => $next_insert_id,
             ':title' => "project_root",
             ':path' => "/".$next_insert_id."/",
             ':project_id' => $project_id,
             ':user_id' => $user_id,
             ':created' => date("Y-m-d H:i:s"),
-        ]);
+        ));
         return $next_insert_id;
     }
 
@@ -308,7 +308,7 @@ class Todo extends BaseModel
     static public function getTodo($id, $user_id){
         new Todo();
         $sql = "SELECT * FROM todo WHERE id = :id AND user_id = :user_id";
-        $todo_data = self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
+        $todo_data = self::$pdo->fetch($sql, array(':id' => $id, 'user_id' => $user_id));
         if($todo_data){
             return self::castIntTodoRecord($todo_data);
         }else{
@@ -324,10 +324,10 @@ class Todo extends BaseModel
      */
     static private function changeDone($todo_id, $to){
         $sql = "UPDATE todo SET is_done=:is_done WHERE id = :id ";
-        $params = [
+        $params = array(
             ':is_done' => $to,
             ':id' => $todo_id,
-        ];
+        );
         new Todo();
         self::$pdo->execute($sql, $params);
     }
@@ -342,29 +342,29 @@ class Todo extends BaseModel
      * @return array
      */
     private static function makeProjectTodoListDataFromRecords($records, $tree = false){
-        $ret_data = [];
+        $ret_data = array();
         $count = 0;
         $tmp_project_id = $records[0]['project_id'];
-        $tmp_records = [];
+        $tmp_records = array();
         foreach($records as $record){
             if($tmp_project_id != $record['project_id']){
                 //１プロジェクト分のデータを作成して次の処理へ進む
-                $ret_data[$count] = [
+                $ret_data[$count] = array(
                     'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
                     'todo_data' => ($tree) ? self::makeTreeData($tmp_records) : self::makeListTodoData($tmp_records),
-                ];
+                );
                 //次の処理のための処理
-                $tmp_records = [];
+                $tmp_records = array();
                 $tmp_project_id = $record['project_id'];
                 $count++;
             }
             $tmp_records[] = $record;
         }
         if(count($tmp_records) > 0){
-            $ret_data[$count] = [
+            $ret_data[$count] = array(
                 'project_data' => self::getProjactDataFromRecord($tmp_records[0]),
                 'todo_data' => ($tree) ? self::makeTreeData($tmp_records) : self::makeListTodoData($tmp_records),
-            ];
+            );
         }
         return $ret_data;
     }
@@ -374,17 +374,17 @@ class Todo extends BaseModel
      * @return array
      */
     public static function makeTreeData($records){
-        $ret_tree_data = [];//返却用Tree構造データ
-        $tmp_list_data = [];//Treeデータ作成に必要なlistデータ
+        $ret_tree_data = array();//返却用Tree構造データ
+        $tmp_list_data = array();//Treeデータ作成に必要なlistデータ
         foreach($records as $todo_data){
             $path_array = array_filter(explode('/', $todo_data['path']), 'strlen');
             $current_id = array_pop($path_array);
             $parent_id = array_pop($path_array);
-            $tmp_list_data[$current_id] = [
+            $tmp_list_data[$current_id] = array(
                 'data' => self::castIntTodoRecord($todo_data),
-                'child' => [],
+                'child' => array(),
 //                'parent' => null,
-            ];
+            );
             if(is_null($parent_id)){
                 $ret_tree_data[$current_id] = &$tmp_list_data[$current_id];
             }else{
@@ -396,7 +396,7 @@ class Todo extends BaseModel
     }
 
     private static function makeListTodoData($records){
-        $ret_array = [];
+        $ret_array = array();
         foreach($records as $todo_data){
             $ret_array[] = self::castIntTodoRecord($todo_data);
         }
@@ -410,14 +410,14 @@ class Todo extends BaseModel
      * @return array
      */
     private static function getProjactDataFromRecord($record){
-        $ret_array = [
+        $ret_array = array(
             'id'            => (int) $record['pj_id'],
             'name'          => $record['pj_name'],
             'view_order'    => $record['pj_view_order'],
             'user_id'       => $record['pj_user_id'],
             'created'       => $record['pj_created'],
             'modified'      => $record['pj_modified'],
-        ];
+        );
         return $ret_array;
     }
 
@@ -429,7 +429,7 @@ class Todo extends BaseModel
      */
     private static function castIntTodoRecord($record){
         foreach($record as $key => &$value){
-            if(in_array($key, ['id', 'project_id', 'user_id'])){
+            if(in_array($key, array('id', 'project_id', 'user_id'))){
                 $value = (int) $value;
             }
         }
@@ -453,7 +453,7 @@ class Todo extends BaseModel
         new Todo();
         $get_data_mode = (isset($start_date)) ? "date" : "all";//all or date
 
-        $params = [];
+        $params = array();
         $where_sql = "WHERE td.user_id = :user_id ";
         $params['user_id'] = $user_id;
         if($project_id){

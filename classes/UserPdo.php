@@ -18,7 +18,7 @@ class UserPdo extends \PDO
      * @param array $params
      * @return array
      */
-    public function fetch($sql, array $params = []){
+    public function fetch($sql, array $params = array()){
         return $this->executeSql($sql, $params, "fetch_one");
     }
 
@@ -27,7 +27,7 @@ class UserPdo extends \PDO
      * @param array $params
      * @return array
      */
-    public function fetchAll($sql, array $params = []){
+    public function fetchAll($sql, array $params = array()){
         return $this->executeSql($sql, $params, "fetch_all");
     }
 
@@ -36,7 +36,7 @@ class UserPdo extends \PDO
      * @param array $params
      * @return bool
      */
-    public function execute($sql, array $params = []){
+    public function execute($sql, array $params = array()){
         return $this->executeSql($sql, $params, "execute_only");
     }
 
@@ -46,8 +46,8 @@ class UserPdo extends \PDO
      * @param string $mode
      * @return array|bool|mixed
      */
-    private function executeSql($sql, array $params = [], $mode = 'execute_only'){
-        if(!in_array($mode, ['fetch_one', 'fetch_all', 'execute_only'])){
+    private function executeSql($sql, array $params = array(), $mode = 'execute_only'){
+        if(!in_array($mode, array('fetch_one', 'fetch_all', 'execute_only'))){
             throw new \PDOException("fetch_modeはoneかallに指定してください");
         }
 

@@ -8,27 +8,27 @@
  * 設定ファイル
  */
 
-$db = [
+$db = array(
     'host' => "host_name",
     'user' => "user_name",
     'password' => "password",
     'db' => "db_name",
-];
-$db = [
-    'test' => [
+);
+$db = array(
+    'test' => array(
         'host' => "host_name",
         'user' => "user_name",
         'password' => "password",
         'db' => "db_name",
-    ],
-    'unit_test' => [
+    ),
+    'unit_test' => array(
         'host' => "host_name",
         'user' => "user_name",
         'password' => "password",
         'db' => "db_name",
-    ]
-];
+    )
+);
 
-return [
+return array(
     "db" => $db,
-];
+);

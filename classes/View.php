@@ -17,17 +17,17 @@ class View
     public function __construct()
     {
         $loader = new \Twig_Loader_Filesystem(TEMPLATE_DIR_PATH);
-        $this->renderer = new \Twig_Environment($loader, [
+        $this->renderer = new \Twig_Environment($loader, array(
             'debug'         => true,//todo:本番ではfalseにする
             'cache'         => VIEW_CACHE_DIR_PATH,//todo:キャッシュが書き込めない
             'charset'       => 'utf-8',
 //            'auto_reload'   => true,
 //        	'autoescape'    => false,
-        ]);
+        ));
         $this->renderer->addExtension(new \Twig_Extension_Debug());
     }
 
-    public function render($template, $args = []){
+    public function render($template, $args = array()){
         //拡張子がなければデフォルト拡張子をつける
         $info = new \SplFileInfo($template);
         if($info->getExtension() == ""){
@@ -43,7 +43,7 @@ class View
      * @param null $error_message
      */
     public function renderError($error_code = 404, $error_message = null){
-        $args = [];
+        $args = array();
         switch($error_code){
             case 400:
                 $template = "error/400";

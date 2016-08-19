@@ -21,12 +21,12 @@ class TodoListController
     private $renderer;  //レンダラー。テンプレートエンジンオブジェクトを格納する
 
     //遷移url
-    private $url = [
+    private $url = array(
         'do_check' => "?controller=TodoList&action=Check",
         'project_list' => "/?controller=TodoList&action=List",
         'daily_list' => "/?controller=TodoList&action=DayList",
         'todo_edit' => "/?controller=TodoList&action=Edit",
-    ];
+    );
     public function __construct()
     {
         $this->request = new Request();
@@ -49,12 +49,12 @@ class TodoListController
         $todo_data_list = Todo::getTodoListByDay(1, "2016-07-20", "2016-07-21");
 
         //表示する
-        $this->renderer->render("day_list", [
+        $this->renderer->render("day_list", array(
             'page_title' => "todoリスト",
             'todo_data_list' => $todo_data_list,
             'url' => $this->url,
             'current' => $this->url['daily_list'],
-        ]);
+        ));
     }
 
     /**
@@ -71,12 +71,12 @@ class TodoListController
         $todo_data_list = Todo::getTodoListByUser(1);
 
         //表示する
-        $this->renderer->render("list", [
+        $this->renderer->render("list", array(
             'page_title' => "todoリスト",
             'todo_data_list' => $todo_data_list,
             'url' => $this->url,
             'current' => $this->url['project_list'],
-        ]);
+        ));
     }
 
     /**
@@ -84,8 +84,8 @@ class TodoListController
      */
     public function actionEdit(){
         $method = $this->request->getMethod();
-        $error_message = [];
-        $input_data = [];
+        $error_message = array();
+        $input_data = array();
 
         if($method === "post"){
             //入力値の取得
@@ -146,14 +146,14 @@ class TodoListController
         }
 
         //編集対象Todoデータを取得
-        $target_todo = [];
-        $same_project_all_todo = [];
+        $target_todo = array();
+        $same_project_all_todo = array();
         $input_id = $this->request->get("id");
         if($input_id){
             //todoデータ取得
             $target_todo = Todo::getTodo($input_id, 1);//todo: ログイン機能つけるまでuser_idは1に決め打ち
             if($target_todo){
-                $project_and_all_todos = Project::getProjectWithTodo([$target_todo['project_id']], true);
+                $project_and_all_todos = Project::getProjectWithTodo(array($target_todo['project_id']), true);
                 $same_project_all_todo = $project_and_all_todos[0]['todo'];
             }
         }
@@ -161,7 +161,7 @@ class TodoListController
         $all_project = Project::getAll(1);
 
         //編集入力フォーム表示。
-        $this->renderer->render("todo_modify", [
+        $this->renderer->render("todo_modify", array(
             'page_title' => "Todo編集",
             'todo_data' => $target_todo,
             'all_project' => $all_project,
@@ -169,7 +169,7 @@ class TodoListController
             'url' => $this->url,
             'error_message' => $error_message,
             'input_data' => $input_data,
-        ]);
+        ));
     }
 
     /**
@@ -187,11 +187,11 @@ class TodoListController
         $input_data = $this->request->post();
 
         //バリデーション。入力を想定しているのは、int todo_id(必須), change_to(必須): "done" or "undone", redirect_url(必須)
-        $valid_error_msg = [];
+        $valid_error_msg = array();
         if(  empty($input_data['todo_id'])
           || !is_numeric($input_data['todo_id'])
           || empty($input_data['change_to'])
-          || !in_array($input_data['change_to'], ["done", "undone"])
+          || !in_array($input_data['change_to'], array("done", "undone"))
           || empty($input_data['redirect_url'])){
             $this->renderer->renderError(400);
         }
