@@ -14,6 +14,7 @@ use classes\Request;
 use models\Todo;
 use models\Project;
 use classes\View;
+use services\TodoService;
 
 class TodoListController
 {
@@ -46,7 +47,7 @@ class TodoListController
         //指定日のtodoデータを取得する
         //todo:user_idをログインユーザーのものにする
         //todo:日付を当日のものにする
-        $todo_data_list = Todo::getTodoListByDay(1, "2016-07-20", "2016-07-21");
+        $todo_data_list = TodoService::getTodoListByDay(1, "2016-07-20", "2016-07-21");
 
         //表示する
         $this->renderer->render("day_list", [

@@ -10,6 +10,55 @@
 namespace models;
 
 class Project extends BaseModel{
+    private $name;
+    private $view_order;
+    private $user_id;
+    private $root_todo_id;
+
+    public function __set($name, $value){
+        if(in_array($name, ['id', 'view_order', 'user_id', 'root_todo_id'])){
+            $this->$name = (in_array($name, ['id', 'user_id'])) ? (int) $value : $value;
+        }
+    }
+
+    public function __get($name){
+        return $this->$name;
+    }
+
+    public function loadArray(array $properties){
+        foreach($properties as $name => $value){
+            $this->__set($name, $value);
+        }
+    }
+
+    static public function getProjectsById(array $ids){
+        $ret_array = [];
+        $clause = implode(", ", array_fill(0, count($ids), '?'));
+        $sql = "SELECT * FROM project WHERE id IN (".$clause.") ";
+        new Project();
+        $result = self::$pdo->fetchAll($sql, $ids);
+        foreach($result as $data){
+            $project = new Project();
+            $project->loadArray($data);
+            $project->created = $data['created'];
+            $project->modified = $data['modified'];
+            $ret_array[$project->id] = $project;
+        }
+        return $ret_array;
+    }
+
+    public function getArray(){
+        $ret_array = [
+            'id' => $this->id,
+            'name' => $this->name,
+            'view_order' => $this->view_order,
+            'user_id' => $this->user_id,
+            'root_todo_id' => $this->root_todo_id,
+            'created' => $this->created,
+            'modified' => $this->modified,
+        ];
+        return $ret_array;
+    }
 
     /**
      * $user_idを受けとてって、全てのプロジェクトデータを返す

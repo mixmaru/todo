@@ -14,6 +14,46 @@ use models\Project;
 
 class Todo extends BaseModel
 {
+    private $title;
+    private $do_date;
+    private $limit_date;
+    private $is_done;
+    private $path;
+    private $project_id;
+    private $user_id;
+
+    public function __set($name, $value){
+        if(in_array($name, ['id', 'title', 'do_date', 'limit_date', 'is_done', 'path', 'project_id', 'user_id'])){
+            $this->$name = (in_array($name, ['id', 'project_id'])) ? (int) $value : $value;
+        }
+    }
+
+    public function __get($name){
+        return $this->$name;
+    }
+
+    public function loadArray(array $properties){
+        foreach($properties as $name => $value){
+            $this->__set($name, $value);
+        }
+    }
+
+    public function getArray(){
+        $ret_array = [
+            'id' => $this->id,
+            'title' => $this->title,
+            'do_date' => $this->do_date,
+            'limit_date' => $this->limit_date,
+            'is_done' => $this->is_done,
+            'path' => $this->path,
+            'project_id' => $this->project_id,
+            'user_id' => $this->user_id,
+            'created' => $this->created,
+            'modified' => $this->modified,
+        ];
+        return $ret_array;
+    }
+
     /**
      * 全てのプロジェクトデータと、それに関連する全てのTodoデータを取得
      *
@@ -393,6 +433,38 @@ class Todo extends BaseModel
             }
         }
         return $ret_tree_data;
+    }
+
+    /**
+     * @param $user_id
+     * @param $start_date
+     * @param $limit_date
+     * @return array
+     */
+    public static function getTodoByDate($user_id, $start_date, $limit_date){
+        $sql = "SELECT td.* FROM todo td "
+              ."INNER JOIN project pj ON pj.id = td.project_id "
+              ."WHERE td.user_id = :user_id "
+              ."AND td.do_date BETWEEN :start_date AND :limit_date "
+              ."OR td.limit_date BETWEEN :start_date AND :limit_date "
+              ."ORDER BY CASE WHEN td.do_date BETWEEN '2016-07-20' AND '2016-07-21' THEN td.do_date ELSE td.limit_date END ASC, "
+              ."pj.view_order ASC ";
+        new Todo();
+        $result = self::$pdo->fetchAll($sql, [
+            ':user_id' => $user_id,
+            ':start_date' => $start_date,
+            ':limit_date' => $limit_date,
+        ]);
+
+        $ret_array = [];
+        foreach($result as $data){
+            $todo = new Todo();
+            $todo->loadArray($data);
+            $todo->created = $data['created'];
+            $todo->modified = $data['modified'];
+            $ret_array[$todo->id] = $todo;
+        }
+        return $ret_array;
     }
 
     private static function makeListTodoData($records){

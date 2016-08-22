@@ -604,7 +604,8 @@ The `retina-sprites` mixin generates a CSS rule and media query for retina group
   padding: 2px 0;
   position: relative;
   color: #990C00;
-  font-size: 15px; }
+  font-size: 15px;
+  height: 20px; }
 
 .dayList__dayTitle {
   text-align: center; }
