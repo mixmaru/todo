@@ -54,31 +54,23 @@ class Todo extends BaseModel
         return $ret_array;
     }
 
-    /**
-     * 全てのプロジェクトデータと、それに関連する全てのTodoデータを取得
-     *
-     * 返却データの形
-     * $ret_data = [
-     *      [
-     *          'project_data' => プロジェクトデータ,
-     *          'todo_data' => [todotreeデータ],
-     *      },
-     *      [
-     *          'project_data' => プロジェクトデータ,
-     *          'todo_data' => [todotreeデータ],
-     *      },
-     * ];
-     *
-     * @param $user_id
-     * @param null $project_id //対象プロジェクトを絞り込む
-     * @return array
-     */
-    public static function getTodoListByUser($user_id, $project_id = null){
-        $records = self::getProjectTodoRecords($user_id, null, null, $project_id);
-        if(count($records) == 0){
-            return [];
+    public static function getTodosByProjectIds(array $project_ids){
+        $ret_array = [];
+        $clause = implode(",", array_fill(0, count($project_ids), '?'));
+        $sql = "SELECT td.* FROM todo td "
+              ."INNER JOIN project pj ON pj.id = td.project_id "
+              ."WHERE project_id IN (".$clause.") "
+              ."ORDER BY pj.view_order ASC, "
+              ."(LENGTH(path) - LENGTH(REPLACE(path, '/', '')) -1) ASC ";
+        new Todo();
+        foreach(self::$pdo->fetchAll($sql, $project_ids) as $todo){
+            $todo_obj = new Todo();
+            $todo_obj->loadArray($todo);
+            $todo_obj->created = $todo['created'];
+            $todo_obj->modified = $todo['modified'];
+            $ret_array[$todo_obj->id] = $todo_obj;
         }
-        return self::makeProjectTodoListDataFromRecords($records, true);
+        return $ret_array;
     }
 
     /**

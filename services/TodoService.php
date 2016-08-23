@@ -58,4 +58,32 @@ class TodoService
 
         return $ret_array;
     }
+
+    /**
+     * user_idを渡して、関連する全てのTodoデータをプロジェクトデータとともに返す
+     *
+     * @param $user_id
+     * @return array
+     *   [
+     *      [
+     *          'project' => [],
+     *          'todo' => [],
+     *      ],
+     *      …
+     *   ]
+     *
+     */
+    public static function getTodoListByUser($user_id){
+        $ret_array = [];
+        //$user_idに関連する全てのprojectデータを取得する
+        $project_objs = Project::getProjectsByUserId($user_id);
+        $project_ids = array_keys($project_objs);
+        $todo_objs = Todo::getTodosByProjectIds($project_ids);//todo:並び順を指定できるようにしたほうがいいかも。ここでは (project_view_order, 深さ順、着手日順)で取り出す
+        foreach($todo_objs as $todo){
+            $tmp_array['project'] = $project_objs[$todo->project_id]->getArray();
+            $tmp_array['todo'] = $todo->getArray();
+            $ret_array[] = $tmp_array;
+        }
+        return $ret_array;
+    }
 }

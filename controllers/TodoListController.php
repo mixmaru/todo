@@ -69,7 +69,7 @@ class TodoListController
         }
 
         //全てのtodoデータを取得する
-        $todo_data_list = Todo::getTodoListByUser(1);
+        $todo_data_list = TodoService::getTodoListByUser(1);
 
         //表示する
         $this->renderer->render("list", [

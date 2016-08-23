@@ -16,8 +16,8 @@ class Project extends BaseModel{
     private $root_todo_id;
 
     public function __set($name, $value){
-        if(in_array($name, ['id', 'view_order', 'user_id', 'root_todo_id'])){
-            $this->$name = (in_array($name, ['id', 'user_id'])) ? (int) $value : $value;
+        if(in_array($name, ['id', 'name', 'view_order', 'user_id', 'root_todo_id'])){
+            $this->$name = (in_array($name, ['id', 'view_order', 'user_id', 'root_todo_id'])) ? (int) $value : $value;
         }
     }
 
@@ -43,6 +43,20 @@ class Project extends BaseModel{
             $project->created = $data['created'];
             $project->modified = $data['modified'];
             $ret_array[$project->id] = $project;
+        }
+        return $ret_array;
+    }
+
+    static public function getProjectsByUserId($user_id){
+        $ret_array = [];
+        $sql = "SELECT * FROM project WHERE user_id = :user_id ";
+        new Project();
+        foreach(self::$pdo->fetchAll($sql, [':user_id' => $user_id]) as $project_data){
+            $project_obj = new Project();
+            $project_obj->loadArray($project_data);
+            $project_obj->created = $project_data['created'];
+            $project_obj->modified = $project_data['modified'];
+            $ret_array[$project_obj->id] = $project_obj;
         }
         return $ret_array;
     }

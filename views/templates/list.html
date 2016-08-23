@@ -1,9 +1,47 @@
 {% extends "base_layout.html" %}
 
 {% block content %}
-
     {% if todo_data_list|length > 0 %}
         {% for data in todo_data_list %}
+            {% if project_id is null %}
+                {% set project_id = data.project.id %}
+                <table class="card projectList" style="margin-top: 10px;">
+                    <thead class="projectList__header">
+                        <tr>
+                            <th>{{ data.project.name }}</th>
+                            <th>着手日</th>
+                            <th>締切</th>
+                        </tr>
+                    </thead>
+                    <tbody class="projectList__contentWrapper">
+            {% endif %}
+            {% if project_id != data.project.id %}
+                {% set project_id = data.project.id %}
+                    </tbody>
+                </table>
+                <table class="card projectList" style="margin-top: 10px;">
+                    <thead class="projectList__header">
+                        <tr>
+                            <th>{{ data.project.name }}</th>
+                            <th>着手日</th>
+                            <th>締切</th>
+                        </tr>
+                    </thead>
+                    <tbody class="projectList__contentWrapper">
+            {% endif %}
+            <tr>
+                <td>
+                    {{ data.todo.title }}
+                </td>
+                <td>
+                    {{ data.todo.do_date }}
+                </td>
+                <td>
+                    {{ data.todo.limit_date }}
+                </td>
+            </tr>
+
+            {#
             <div class="card projectList" style="margin-top: 10px;">
                 <header class="projectList__header">
                     <p class="projectList__projectName">{{data.project_data.name}}</p>
@@ -14,7 +52,10 @@
                     {% endfor %}
                 </article>
             </div>
+            #}
         {% endfor %}
+            </tbody>
+        </table>
     {% else %}
     <p>todoはありません</p>
     {% endif %}
