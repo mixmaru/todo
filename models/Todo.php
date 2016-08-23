@@ -228,7 +228,8 @@ class Todo extends BaseModel
     static public function modifyTodo($id, $title, $do_date, $limit_date, $project_id, $user_id){
         $error_msg = [];
         //バリデーション
-        $target_todo = self::getTodo($id, $user_id);
+        $target_todo_obj = self::getTodo($id, $user_id);
+        $target_todo = $target_todo_obj->getArray();
         if(empty($target_todo)){
             $error_msg['id'] = "todoのidが不正です";
         }
@@ -338,11 +339,14 @@ class Todo extends BaseModel
      * @return array
      */
     static public function getTodo($id, $user_id){
-        new Todo();
+        $todo = new Todo();
         $sql = "SELECT * FROM todo WHERE id = :id AND user_id = :user_id";
         $todo_data = self::$pdo->fetch($sql, [':id' => $id, 'user_id' => $user_id]);
         if($todo_data){
-            return self::castIntTodoRecord($todo_data);
+            $todo->loadArray($todo_data);
+            $todo->created = $todo_data['created'];
+            $todo->modified = $todo_data['modified'];
+            return $todo;
         }else{
             return false;
         }

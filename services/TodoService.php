@@ -86,4 +86,10 @@ class TodoService
         }
         return $ret_array;
     }
+
+    public static function getTodoById($todo_id, $user_id){
+        $ret_array = [];
+        $todo_obj = Todo::getTodo($todo_id, $user_id);
+        return $todo_obj->getArray();
+    }
 }

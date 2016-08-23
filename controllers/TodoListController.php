@@ -15,6 +15,7 @@ use models\Todo;
 use models\Project;
 use classes\View;
 use services\TodoService;
+use services\ProjectService;
 
 class TodoListController
 {
@@ -146,7 +147,17 @@ class TodoListController
             }
         }
 
+        //編集対象Todoデータを取得。データがなければ新規作成
+        $target_todo = [];
+        $input_id = $this->request->get("id");
+        if($input_id){
+            //todoデータ取得
+            $target_todo = TodoService::getTodoById($input_id, 1);//todo: ログイン機能をつけるまでuser_idは1に決め打ち
+        }
+        $all_project = ProjectService::getAllProjectByUserId(1);
+
         //編集対象Todoデータを取得
+        /*
         $target_todo = [];
         $same_project_all_todo = [];
         $input_id = $this->request->get("id");
@@ -160,13 +171,14 @@ class TodoListController
         }
         //すべてのプロジェクトデータを取得
         $all_project = Project::getAll(1);
+        */
 
         //編集入力フォーム表示。
         $this->renderer->render("todo_modify", [
             'page_title' => "Todo編集",
             'todo_data' => $target_todo,
             'all_project' => $all_project,
-            'all_todo_list' => $same_project_all_todo,
+            'all_todo_list' => [],
             'url' => $this->url,
             'error_message' => $error_message,
             'input_data' => $input_data,

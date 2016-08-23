@@ -88,7 +88,11 @@ class Project extends BaseModel{
 
         $ret_array = [];
         foreach(self::$pdo->fetchAll($sql, ['user_id' => $user_id]) as $record){
-            $ret_array[] = self::castIntProjectRecord($record);
+            $project = new Project();
+            $project->loadArray($record);
+            $project->created = $record['created'];
+            $project->modified = $record['modified'];
+            $ret_array[] = $project;
         }
         return $ret_array;
     }
