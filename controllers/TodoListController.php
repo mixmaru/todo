@@ -97,6 +97,41 @@ class TodoListController
                 //指定Todoの削除
                 var_dump("削除");
             }elseif(isset($input_data['up'])){
+                $error_messare = [];
+                //入力値のチェック。
+                if($input_data['project_id'] == -1) {
+                    //新規プロジェクト作成の場合
+                    $project = new Project();
+                    $project->id = $input_data['project_id'];
+                    $project->name = $input_data['new_project_name'];
+                    $project->user_id = 1;
+                    $project->view_order = -1;//とりあえず指定
+                    $tmp_error_msg = ProjectService::validate($project);
+                    if(isset($tmp_error_msg['id']))     $error_message['project_id']        = $tmp_error_msg['id'];
+                    if(isset($tmp_error_msg['name']))   $error_message['new_project_name']  = $tmp_error_msg['name'];
+                }
+                //todoデータのバリデーション
+                $todo = new Todo();
+                $todo->id = $input_data['todo_id'];
+                $todo->title = $input_data['todo_title'];
+                $todo->limit_date = $input_data['todo_limit_date'];
+                $todo->do_date = $input_data['todo_do_date'];
+                $todo->project_id = $input_data['project_id'];
+                $todo->path = "/";//とりあえず
+                $todo->user_id = 1;//ログイン機能できるまで1で決め打ち
+                $tmp_error_msg = TodoService::validate($todo);
+                if(isset($tmp_error_msg['id'])) $error_message['todo_id'] = $tmp_error_msg['id'];
+                if(isset($tmp_error_msg['title'])) $error_message['todo_title'] = $tmp_error_msg['title'];
+                if(isset($tmp_error_msg['limit_date'])) $error_message['todo_limit_date'] = $tmp_error_msg['limit_date'];
+                if(isset($tmp_error_msg['do_date'])) $error_message['todo_do_date'] = $tmp_error_msg['do_date'];
+                if(isset($tmp_error_msg['project_id'])) $error_message['project_id'] = $tmp_error_msg['project_id'];
+                if(empty($error_message)){
+                    var_dump("親Todo選択画面へリダイレクト");
+//                    セッションに入力データを保存
+//                    親todo指定ページへリダイレクト
+                    return;
+                }
+                /*
                 if($input_data['project_id'] == -1){
                     //新規プロジェクト作成
                     $result = Project::newProject($input_data['new_project_name'], 1);//todo:ログインシステム実装するまでuser_idを1に決め打ち
@@ -134,17 +169,18 @@ class TodoListController
                         if(isset($tmp_error_msg['project_id'])) $error_message['project_id'] = $tmp_error_msg['project_id'];
                     }
                 }
+                */
 
             }else{
                 $this->renderer->renderError(400);
                 exit();
             }
             //一覧へリダイレクト
-            if(count($error_message) <= 0){
-                //            header('Location: /?controller=TodoList&action=List');
-                var_dump("リダイレクト");
-                exit();
-            }
+//            if(count($error_message) <= 0){
+//                //            header('Location: /?controller=TodoList&action=List');
+//                var_dump("リダイレクト");
+//                exit();
+//            }
         }
 
         //編集対象Todoデータを取得。データがなければ新規作成

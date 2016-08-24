@@ -54,6 +54,48 @@ class Todo extends BaseModel
         return $ret_array;
     }
 
+    public function validate(){
+        $error_msg = [];
+        //idはintで必須。新規登録の場合は-1が入る
+        if(!(isset($this->id) && is_numeric($this->id))){
+            $error_msg['id'] = "idは数字で指定してください";
+        }
+        //titleは文字列で必須
+        if(!(isset($this->title) && is_string($this->title) && $this->title != "")){
+            $error_msg['title'] = "プロジェクト名を指定してください";
+        }
+        //do_dateは日付
+        if(isset($this->do_date) && $this->do_date != date("Y-m-d", strtotime($this->do_date))){
+            $error_msg['do_date'] = "正しい日付を指定してください";
+        }
+        //limit_dateは日付
+        if(isset($this->limit_date) && $this->limit_date != date("Y-m-d", strtotime($this->limit_date))){
+            $error_msg['limit_date'] = "正しい日付を指定してください";
+        }
+        //is_doneはDONE or UNDONE。指定がなければUNDONEが入る
+        if($this->is_done != "DONE" && $this->is_done != "UNDONE"){
+            $this->is_done = "UNDONE";
+        }
+        //pathは必須
+        if(!isset($this->path)){
+            $error_msg['path'] = "pathを正しく指定してください";
+        }
+        //user_idは必須で数値
+        if(!is_numeric($this->user_id)){
+            $error_msg['user_id'] = "ユーザーidを正しく指定してください";
+        }
+        //project_idはintで必須 -1はプロジェクトを同時に登録するときに入る。user_idが正しく入力されている場合は、そのユーザーのプロジェクトである
+        if(!is_numeric($this->project_id)){
+            $error_msg['project_id'] = "プロジェクトidを正しく指定してください";
+        }elseif($this->project_id != -1 && !isset($error_msg['user_id'])){
+            $project = new Project($this->project_id);
+            if($project->user_id != $this->user_id){
+                $error_msg['project_id'] = "プロジェクトidを正しく指定してください";
+            }
+        }
+        return $error_msg;
+    }
+
     public static function getTodosByProjectIds(array $project_ids){
         $ret_array = [];
         $clause = implode(",", array_fill(0, count($project_ids), '?'));

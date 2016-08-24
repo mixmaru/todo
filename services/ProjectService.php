@@ -19,4 +19,8 @@ class ProjectService
         }
         return $ret_array;
     }
+
+    public static function validate(Project $project){
+       return $project->validate();
+    }
 }

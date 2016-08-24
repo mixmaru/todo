@@ -13,6 +13,9 @@ use models\Project;
 
 class TodoService
 {
+    public static function validate(Todo $todo){
+        return $todo->validate();
+    }
 
     /**
      * user_idと期間を渡して期間内のTodoデータを取得する

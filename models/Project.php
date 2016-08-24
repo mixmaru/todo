@@ -15,6 +15,23 @@ class Project extends BaseModel{
     private $user_id;
     private $root_todo_id;
 
+    /**
+     * Project constructor.
+     * @param null $id
+     */
+    public function __construct($id = null){
+        parent::__construct();
+        if($id){
+            $sql = "SELECT * FROM project WHERE id = :id";
+            $result = self::$pdo->fetch($sql, [':id' => $id]);
+            if($result){
+                $this->loadArray($result);
+                $this->created = $result['created'];
+                $this->modified = $result['modified'];
+            }
+        }
+    }
+
     public function __set($name, $value){
         if(in_array($name, ['id', 'name', 'view_order', 'user_id', 'root_todo_id'])){
             $this->$name = (in_array($name, ['id', 'view_order', 'user_id', 'root_todo_id'])) ? (int) $value : $value;
@@ -29,6 +46,31 @@ class Project extends BaseModel{
         foreach($properties as $name => $value){
             $this->__set($name, $value);
         }
+    }
+
+    public function validate(){
+        $error_msg = [];
+        //idはintで必須。新規登録の場合は-1が入る
+        if(!(isset($this->id) && is_numeric($this->id))){
+            $error_msg['id'] = "idは数字で指定してください";
+        }
+        //nameは文字列で必須
+        if(!(isset($this->name) && is_string($this->name) && $this->name != "")){
+            $error_msg['name'] = "プロジェクト名を指定してください";
+        }
+        //view_orderはintで必須
+        if(!(isset($this->view_order) && is_numeric($this->view_order))){
+            $error_msg['view_order'] = "並び順を指定してください";
+        }
+        //user_idはintで必須
+        if(!(isset($this->user_id) && is_numeric($this->user_id))){
+            $error_msg['user_id'] = "ユーザーidを指定してください";
+        }
+        //root_todo_idはint
+        if(isset($this->root_todo_id) && !is_numeric($this->root_todo_id)){
+            $error_msg['root_todo_id'] = "ルートTodoは数字で指定してください";
+        }
+        return $error_msg;
     }
 
     static public function getProjectsById(array $ids){
