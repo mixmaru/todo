@@ -21,6 +21,14 @@ class ProjectService
     }
 
     public static function validate(Project $project){
-       return $project->validate();
+        $error_msg['id'] = $project->validateId();
+        $error_msg['name'] = $project->validateName();
+        $error_msg['user_id'] = $project->validateUserId();
+        foreach($error_msg as $key => $value){
+            if(empty($value)){
+                unset($error_msg[$key]);
+            }
+        }
+        return $error_msg;
     }
 }

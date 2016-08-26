@@ -105,7 +105,6 @@ class TodoListController
                     $project->id = $input_data['project_id'];
                     $project->name = $input_data['new_project_name'];
                     $project->user_id = 1;
-                    $project->view_order = -1;//とりあえず指定
                     $tmp_error_msg = ProjectService::validate($project);
                     if(isset($tmp_error_msg['id']))     $error_message['project_id']        = $tmp_error_msg['id'];
                     if(isset($tmp_error_msg['name']))   $error_message['new_project_name']  = $tmp_error_msg['name'];
@@ -117,7 +116,6 @@ class TodoListController
                 $todo->limit_date = $input_data['todo_limit_date'];
                 $todo->do_date = $input_data['todo_do_date'];
                 $todo->project_id = $input_data['project_id'];
-                $todo->path = "/";//とりあえず
                 $todo->user_id = 1;//ログイン機能できるまで1で決め打ち
                 $tmp_error_msg = TodoService::validate($todo);
                 if(isset($tmp_error_msg['id'])) $error_message['todo_id'] = $tmp_error_msg['id'];

@@ -50,25 +50,49 @@ class Project extends BaseModel{
 
     public function validate(){
         $error_msg = [];
+        $error_msg['id'] = $this->validateId();
+        $error_msg['name'] = $this->validateName();
+        $error_msg['view_order'] = $this->validateViewOrder();
+        $error_msg['user_id'] = $this->validateUserId();
+        $error_msg['root_todo_id'] = $this->validateRootTodoId();
+        return $error_msg;
+    }
+
+    public function validateId(){
+        $error_msg = [];
         //idはintで必須。新規登録の場合は-1が入る
         if(!(isset($this->id) && is_numeric($this->id))){
-            $error_msg['id'] = "idは数字で指定してください";
+            $error_msg[] = "idは数字で指定してください";
         }
-        //nameは文字列で必須
+        return $error_msg;
+    }
+    public function validateName(){
+        $error_msg = [];
         if(!(isset($this->name) && is_string($this->name) && $this->name != "")){
-            $error_msg['name'] = "プロジェクト名を指定してください";
+            $error_msg[] = "プロジェクト名を指定してください";
         }
-        //view_orderはintで必須
+        return $error_msg;
+    }
+    public function validateViewOrder(){
+        $error_msg = [];
         if(!(isset($this->view_order) && is_numeric($this->view_order))){
-            $error_msg['view_order'] = "並び順を指定してください";
+            $error_msg[] = "並び順を指定してください";
         }
+        return $error_msg;
+    }
+    public function validateUserId(){
+        $error_msg = [];
         //user_idはintで必須
         if(!(isset($this->user_id) && is_numeric($this->user_id))){
-            $error_msg['user_id'] = "ユーザーidを指定してください";
+            $error_msg[] = "ユーザーidを指定してください";
         }
+        return $error_msg;
+    }
+    public function validateRootTodoId(){
+        $error_msg = [];
         //root_todo_idはint
         if(isset($this->root_todo_id) && !is_numeric($this->root_todo_id)){
-            $error_msg['root_todo_id'] = "ルートTodoは数字で指定してください";
+            $error_msg[] = "ルートTodoは数字で指定してください";
         }
         return $error_msg;
     }

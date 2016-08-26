@@ -14,7 +14,18 @@ use models\Project;
 class TodoService
 {
     public static function validate(Todo $todo){
-        return $todo->validate();
+        $error_msg['id'] = $todo->validateId();
+        $error_msg['title'] = $todo->validateTitle();
+        $error_msg['do_date'] = $todo->validateDoDate();
+        $error_msg['limit_date'] = $todo->validateLimitDate();
+        $error_msg['user_id'] = $todo->validateUserId();
+        $error_msg['project_id'] = $todo->validateProjectId();
+        foreach($error_msg as $key => $value){
+            if(empty($value)){
+                unset($error_msg[$key]);
+            }
+        }
+        return $error_msg;
     }
 
     /**

@@ -13,31 +13,41 @@
             <div class="todoModify__titleBlock">
                 <h2 class="todoModify__title">タイトル</h2>
                 {% if error_message.todo_title %}
-                    <p class="todoModify__errorMessage">※{{ error_message.todo_title }}</p>
+                    {% for msg in error_message.todo_title %}
+                        <p class="todoModify__errorMessage">※{{ msg }}</p>
+                    {% endfor %}
                 {% endif %}
                 <input class="todoModify__inputText" placeholder="インターステラーを観る" type="text" name="todo_title" value="{% if input_data.todo_title is null %}{{ todo_data.title }}{% else %}{{ input_data.todo_title }}{% endif %}">
             </div>
             <div class="todoModify__limitDateBlock">
                 <h2 class="todoModify__title">締切</h2>
                 {% if error_message.todo_limit_date %}
-                    <p class="todoModify__errorMessage">※{{ error_message.todo_limit_date }}</p>
+                    {% for msg in error_message.todo_limit_date %}
+                        <p class="todoModify__errorMessage">※{{ msg }}</p>
+                    {% endfor %}
                 {% endif %}
                 <input class="todoModify__inputDate" type="date" name="todo_limit_date" value="{% if input_data.todo_limit_date is null %}{{ todo_data.limit_date }}{% else %}{{ input_data.todo_limit_date }}{% endif %}">
             </div>
             <div class="todoModify__doDateBlock">
                 <h2 class="todoModify__title">着手日</h2>
                 {% if error_message.todo_do_date %}
-                    <p class="todoModify__errorMessage">※{{ error_message.todo_do_date }}</p>
+                    {% for msg in error_message.todo_do_date %}
+                        <p class="todoModify__errorMessage">※{{ msg }}</p>
+                    {% endfor %}
                 {% endif %}
                 <input class="todoModify__inputDate" type="date" name="todo_do_date" value="{% if input_data.todo_do_date is null %}{{ todo_data.do_date }}{% else %}{{ input_data.todo_do_date }}{% endif %}">
             </div>
             <div class="todoModify__projectBlock">
                 <h2 class="todoModify__title">プロジェクト</h2>
                 {% if error_message.project_id %}
-                    <p class="todoModify__errorMessage">※{{ error_message.project_id }}</p>
+                    {% for msg in error_message.project_id %}
+                        <p class="todoModify__errorMessage">※{{ msg }}</p>
+                    {% endfor %}
                 {% endif %}
                 {% if error_message.new_project_name %}
-                    <p class="todoModify__errorMessage">※{{ error_message.new_project_name }}</p>
+                    {% for msg in error_message.new_project_name %}
+                        <p class="todoModify__errorMessage">※{{ msg }}</p>
+                    {% endfor %}
                 {% endif %}
                 <ul class="todoModify__projectListBlock">
                     {% if input_data.project_id is null %}
@@ -65,7 +75,9 @@
             <div class="todoModify__parentTodoBlock">
                 <h2 class="todoModify__title">親作業</h2>
                 {% if error_message.parent_todo_id %}
-                    <p class="todoModify__errorMessage">※{{ error_message.parent_todo_id }}</p>
+                    {% for msg in error_message.parent_todo_id %}
+                        <p class="todoModify__errorMessage">※{{ msg }}</p>
+                    {% endfor %}
                 {% endif %}
                 {% for todo_root in all_todo_list %}
                     {% include 'parts/todo_list_radio.html' with {'all_todo_list': todo_root.child, 'target_todo': todo_data} only %}
