@@ -12,6 +12,7 @@ namespace controllers;
 use classes\FlashMessage;
 use classes\Request;
 use forms\TodoEditForm;
+use forms\ParentTodoEditForm;
 use models\Todo;
 use models\Project;
 use classes\View;
@@ -96,6 +97,7 @@ class TodoListController
             if($form->validate()){
                 $form->temporarySave();
                 //親todo指定ページへリダイレクト
+                header('Location: /?controller=TodoList&action=EditParent');
                 return;
             }
             //エラー
@@ -121,6 +123,53 @@ class TodoListController
             'error_message' => $error_message,
             'input_data' => $form->getArray(),
         ]);
+    }
+
+    public function actionEditParent(){
+        $todo_edit_form = new TodoEditForm();
+        if(!$todo_edit_form->temporaryLoad()){
+            //前ページでの入力データがない。最初のページへリダイレクト
+            header('Location: /?controller=TodoList&action=Edit');
+            return;
+        }
+        $error_message = [];
+        $form = new ParentTodoEditForm();
+        if($this->request->getMethod() == "post" || $todo_edit_form->project_id == -1){
+            if($this->request->getMethod() == "post"){
+                var_dump("入力値の確認");
+                //入力値の確認
+                /*
+                $form->loadArray($this->request->post());
+                if($form->validate()){
+                    //登録処理
+                }
+                $error_message = $form->error_messages;
+                */
+            }
+            if(empty($error_message)){
+                var_dump("登録処理");
+                if($todo_edit_form->project_id == -1){
+                    var_dump("プロジェクトの新規登録");
+                }
+                var_dump("Todoの新規登録");
+                var_dump("セッションデータの削除");
+                $todo_edit_form->temporaryDestroy();
+                var_dump("完了画面へリダイレクト");
+                return;
+            }
+        }
+        //親todoの選択画面を表示
+        //プロジェクトidから全てのtodoデータを取得する。
+        var_dump("画面表示");
+        $todos = TodoService::getTodoListByProjectId($todo_edit_form->project_id);
+        var_dump($todos);
+        /*todo:
+        $this->renderer->render("parent_todo_modify", [
+            'todos' => $todos,
+            'error_message' => $error_message,
+            'input_data' => $form->getArray(),
+        ]);
+        */
     }
 
     /**
