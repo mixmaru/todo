@@ -73,6 +73,15 @@ class TodoService
         return $ret_array;
     }
 
+    public static function getTodoListByProjectId($project_id){
+        $ret_array = [];
+        $todo_objs = Todo::getTodosByProjectIds([$project_id]);
+        foreach($todo_objs as $todo){
+            $ret_array[] = $todo->getArray();
+        }
+        return $ret_array;
+    }
+
     /**
      * user_idを渡して、関連する全てのTodoデータをプロジェクトデータとともに返す
      *
