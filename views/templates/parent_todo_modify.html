@@ -1,0 +1,41 @@
+{% extends "base_layout.html" %}
+{% block bodyAddClassName %}body__backgroundWhite{% endblock %}
+{% block header %}
+    <header class="headerReturn">
+        <h1 class="headerReturn__title">親Todo編集</h1>
+        {#<a class="headerReturn__submitButton button" href="">登録</a>#}
+    </header>
+{% endblock %}
+{% block content %}
+    <section class="todoModify">
+        <form action="" method="post">
+            <div class="todoModify__parentTodoBlock">
+                <h2 class="todoModify__title">親作業</h2>
+                {% if error_message.parent_todo_id %}
+                    {% for msg in error_message.parent_todo_id %}
+                        <p class="todoModify__errorMessage">※{{ msg }}</p>
+                    {% endfor %}
+                {% endif %}
+                <ul class="todoModify__todoListBlock">
+                    {% for todo in todos %}
+                        {% if loop.index0 == 0 %}{# todoを階層指定できるようにするときifを除去する #}
+                        <li class="todoModify__todoListList">
+                            <label>
+                                <input type="radio" name="parent_todo_id" value="{{ todo.id }}" {% if todo.id == target_parent_todo_id %}checked{% endif %}>
+                                {% if todo.title == "project_root" %}
+                                    親を指定しない
+                                {% else %}
+                                    {{ todo.title }}
+                                {% endif %}
+                            </label>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="todoModify__submitBlock">
+                <input class="todoModify__submitButton button button--big button--primary" type="submit" value="登録">
+            </div>
+        </form>
+    </section>
+{% endblock %}

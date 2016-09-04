@@ -8,13 +8,18 @@
 
 namespace forms;
 
+use models\Project;
+
 class ParentTodoEditForm extends BaseForm
 {
 
-    private $parent_todo_id;
+    protected $parent_todo_id;
 
 
     public function validate(){
+        //指定parent_todo_idが指定projectに属するtodoであるか確認
+
+
         return empty($this->error_messages) ? true : false;
     }
 }

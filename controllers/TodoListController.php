@@ -135,16 +135,16 @@ class TodoListController
         $error_message = [];
         $form = new ParentTodoEditForm();
         if($this->request->getMethod() == "post" || $todo_edit_form->project_id == -1){
+            //親Todoの入力後 または プロジェクトが新規登録だった場合は 登録処理に入る
             if($this->request->getMethod() == "post"){
-                var_dump("入力値の確認");
                 //入力値の確認
-                /*
                 $form->loadArray($this->request->post());
                 if($form->validate()){
                     //登録処理
+                    var_dump("Project登録");
                 }
                 $error_message = $form->error_messages;
-                */
+                var_dump($error_message);exit();
             }
             if(empty($error_message)){
                 var_dump("登録処理");
@@ -158,18 +158,20 @@ class TodoListController
                 return;
             }
         }
+
         //親todoの選択画面を表示
         //プロジェクトidから全てのtodoデータを取得する。
-        var_dump("画面表示");
         $todos = TodoService::getTodoListByProjectId($todo_edit_form->project_id);
-        var_dump($todos);
-        /*todo:
+        //親Todoのidを取得する
+        $target_parent_todo_id = ($todo_edit_form->todo_id == -1) ? false : TodoService::getParentTodoIdById($todo_edit_form->todo_id);
+
         $this->renderer->render("parent_todo_modify", [
+            'page_title' => "親Todo編集",
+            'target_parent_todo_id' => $target_parent_todo_id,
             'todos' => $todos,
             'error_message' => $error_message,
             'input_data' => $form->getArray(),
         ]);
-        */
     }
 
     /**
