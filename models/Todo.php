@@ -157,6 +157,42 @@ class Todo extends BaseModel
         return $error_msg;
     }
 
+    public function validationPath(){
+        $error_msg = [];
+        //パスの構成が正しいかチェック。
+        //構成するidのTodoデータ($thisも含めて)のプロジェクトid,user_idが全て同一であるはず。
+        $todo_ids = explode("/", trim($this->path, "/"));
+        if(isset($this->id)){
+            //pathの末のidは$this->idのはず。
+            $tmp_id = array_pop($todo_ids);
+            if($this->id != $tmp_id){
+                $error_msg[] = "pathがただしくありません";
+                return $error_msg;
+            }
+        }
+        //全てのidのtodoオブジェクトを作成する
+        $todo_objects = self::getTodosByIds($todo_ids);
+        $project_ids = [];
+        $user_ids = [];
+        foreach($todo_objects as $todo_obj){
+            $project_ids[] = $todo_obj->project_id;
+            $user_ids[] = $todo_obj->user_id;
+        }
+
+        //todo:リファクタできそう
+        $uniqued_project_ids = array_unique($project_ids);
+        if(!(count($uniqued_project_ids) == 1 && current($uniqued_project_ids) == $this->project_id)){
+            $error_msg[] = "pathがただしくありません";
+            return $error_msg;
+        }
+        $uniqued_user_ids = array_unique($user_ids);
+        if(!(count($uniqued_user_ids) == 1 && current($uniqued_user_ids) == $this->user_id)){
+            $error_msg[] = "pathがただしくありません";
+            return $error_msg;
+        }
+        return $error_msg;
+    }
+
     public static function getTodosByProjectIds(array $project_ids){
         $ret_array = [];
         $clause = implode(",", array_fill(0, count($project_ids), '?'));
@@ -249,6 +285,29 @@ class Todo extends BaseModel
         $ret_array = [];
         foreach(self::$pdo->fetchAll($sql, $project_ids) as $todo_record){
             $ret_array[] = self::castIntTodoRecord($todo_record);
+        }
+        return $ret_array;
+    }
+
+    /**
+     * @param array $ids todo_idの配列
+     * @return Todo[]
+     */
+    public static function getTodosByIds(array $ids){
+        if(empty($ids)){
+            return [];
+        }
+        $in_array = array_fill(0, count($ids), "?");
+        $sql = "SELECT * FROM todo WHERE id IN (".implode(",", $in_array).") ";
+        new Todo();
+        if(!$result = self::$pdo->fetchAll($sql, $ids)){
+            return [];
+        }
+        $ret_array = [];
+        foreach($result as $data){
+            $tmp_todo = new Todo();
+            $tmp_todo->loadArray($data);
+            $ret_array[] = $tmp_todo;
         }
         return $ret_array;
     }
@@ -684,5 +743,18 @@ class Todo extends BaseModel
     public function getParentId(){
         $path_array = explode("/", $this->path);
         return (int) $path_array[count($path_array) - 3];
+    }
+
+    /**
+     * 親todo_idから$pathをセットする。$this->idがあれば、自分のidを最後に付加する。ない場合は、保存するタイミングで決定されるidが付加される。
+     * $this->id
+     * @param $parent_todo_id
+     */
+    public function setPathByParentTodoId($parent_todo_id){
+        $todo = new Todo($parent_todo_id);
+        $this->path = $todo->path;
+        if(isset($this->id)){
+            $this->path .= $this->id."/";
+        }
     }
 }
