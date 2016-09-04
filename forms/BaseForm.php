@@ -25,6 +25,13 @@ class BaseForm
         return $this->$name;
     }
 
+    public function __set($name, $value)
+    {
+        if(property_exists($this, $name)){
+            $this->$name = $value;
+        }
+    }
+
     public function loadArray(array $properties){
         foreach($properties as $key => $value){
             if(property_exists($this, $key)){

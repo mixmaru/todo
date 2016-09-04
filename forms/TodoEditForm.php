@@ -15,6 +15,8 @@ use classes\Session;
 class TodoEditForm extends BaseForm
 {
     const TEMP_SAVE_SESSION_KEY = "TodoEditFormTempSave";
+    const VALIDATION_PRE_CHECK = 1;
+    const VALIDATION_LAST_CHECK = 2;
 
     protected $todo_id;
     protected $todo_title;
@@ -23,7 +25,14 @@ class TodoEditForm extends BaseForm
     protected $project_id;
     protected $new_project_name;
 
-    public function validate(){
+    protected $parent_todo_id;
+
+    /**
+     * @param $validation_mode VALIDATION_PRE_CHECK(Todo登録・編集ページのバリデーション)
+     *                         VALIDATION_LAST_CHECK (登録処理前の最終バリデーション)デフォルト
+     * @return bool
+     */
+    public function validate($validation_mode = self::VALIDATION_LAST_CHECK){
         //新規プロジェクト作成の場合、projectデータのバリデーション
         if($this->project_id == -1){
             $project = new Project();
@@ -47,6 +56,13 @@ class TodoEditForm extends BaseForm
         $this->error_messages['todo_limit_date'] = $todo->validateLimitDate();
         $this->error_messages['user_id'] = $todo->validateUserId();
         $this->error_messages['project_id'] = $todo->validateProjectId();
+
+        //登録処理前最終チェック
+        if($validation_mode == self::VALIDATION_LAST_CHECK){
+            //$parent_todo_idが設定されている場合、そのidは$project_idに属しているものかチェック
+            $todo->setPathByParentTodoId($this->parent_todo_id);
+            $this->error_messages['parent_todo_id'] = $todo->validationPath();
+        }
 
         foreach($this->error_messages as $key => $value){
             if(empty($value)){
