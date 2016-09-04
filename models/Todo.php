@@ -22,6 +22,19 @@ class Todo extends BaseModel
     private $project_id;
     private $user_id;
 
+    public function __construct($id = null){
+        parent::__construct();
+        if($id){
+            $sql = "SELECT * FROM todo WHERE id = :id";
+            $result = self::$pdo->fetch($sql, [':id' => $id]);
+            if($result){
+                $this->loadArray($result);
+                $this->created = $result['created'];
+                $this->modified = $result['modified'];
+            }
+        }
+    }
+
     public function __set($name, $value){
         if(in_array($name, ['id', 'title', 'do_date', 'limit_date', 'is_done', 'path', 'project_id', 'user_id'])){
             $this->$name = (in_array($name, ['id', 'project_id'])) ? (int) $value : $value;
@@ -664,13 +677,12 @@ class Todo extends BaseModel
     }
 
     /**
-     * todoテーブルのpathの値から、親Todo idを返す
+     * pathの値から、親Todo idを切り出して返す
      *
-     * @param $path
      * @return int
      */
-    private static function convertParentIdByPath($path){
-        $path_array = explode("/", $path);
+    public function getParentId(){
+        $path_array = explode("/", $this->path);
         return (int) $path_array[count($path_array) - 3];
     }
 }
