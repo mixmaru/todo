@@ -94,7 +94,7 @@ class TodoListController
         if($method === "post"){
             //入力値の取得
             $form->loadArray($this->request->post());
-            if($form->validate()){
+            if($form->validate(TodoEditForm::VALIDATION_PRE_CHECK)){
                 $form->temporarySave();
                 //親todo指定ページへリダイレクト
                 header('Location: /?controller=TodoList&action=EditParent');
@@ -126,44 +126,37 @@ class TodoListController
     }
 
     public function actionEditParent(){
-        $todo_edit_form = new TodoEditForm();
-        if(!$todo_edit_form->temporaryLoad()){
+        $form = new TodoEditForm();
+        if(!$form->temporaryLoad()){
             //前ページでの入力データがない。最初のページへリダイレクト
             header('Location: /?controller=TodoList&action=Edit');
             return;
         }
         $error_message = [];
-        $form = new ParentTodoEditForm();
-        if($this->request->getMethod() == "post" || $todo_edit_form->project_id == -1){
-            //親Todoの入力後 または プロジェクトが新規登録だった場合は 登録処理に入る
-            if($this->request->getMethod() == "post"){
-                //入力値の確認
-                $form->loadArray($this->request->post());
-                if($form->validate()){
-                    //登録処理
-                    var_dump("Project登録");
-                }
-                $error_message = $form->error_messages;
-                var_dump($error_message);exit();
-            }
-            if(empty($error_message)){
+        //プロジェクトが新規登録だった場合は親Todoを指定する必要がないので、登録処理に入る.
+        $method = $this->request->getMethod();
+        if($form->project_id == -1 || $method == "post"){
+            //親Todo入力値の取得
+            if($method == "post") $form->parent_todo_id = $this->request->post("parent_todo_id");
+            if($form->validate(TodoEditForm::VALIDATION_LAST_CHECK)){//念のためバリデーション
                 var_dump("登録処理");
-                if($todo_edit_form->project_id == -1){
-                    var_dump("プロジェクトの新規登録");
-                }
-                var_dump("Todoの新規登録");
-                var_dump("セッションデータの削除");
-                $todo_edit_form->temporaryDestroy();
-                var_dump("完了画面へリダイレクト");
+                //Todoとプロジェクトの登録処理。
+                //完了画面へリダイレクト
+                $form->temporaryDestroy();
+                return;
+            }elseif(false){
+                //$parent_todo_id以外のエラーがある場合は不正な操作としてエラー
+                $form->temporaryDestroy();
+                $this->renderer->renderError(400);
                 return;
             }
         }
 
         //親todoの選択画面を表示
         //プロジェクトidから全てのtodoデータを取得する。
-        $todos = TodoService::getTodoListByProjectId($todo_edit_form->project_id);
+        $todos = TodoService::getTodoListByProjectId($form->project_id);
         //親Todoのidを取得する
-        $target_parent_todo_id = ($todo_edit_form->todo_id == -1) ? false : TodoService::getParentTodoIdById($todo_edit_form->todo_id);
+        $target_parent_todo_id = ($form->todo_id == -1) ? false : TodoService::getParentTodoIdById($form->todo_id);
 
         $this->renderer->render("parent_todo_modify", [
             'page_title' => "親Todo編集",
