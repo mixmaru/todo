@@ -77,7 +77,7 @@ class TodoService
         $ret_array = [];
         $todo_objs = Todo::getTodosByProjectIds([$project_id]);
         foreach($todo_objs as $todo){
-            $ret_array[] = $todo->getArray();
+            $ret_array[$todo->id] = $todo->getArray();
         }
         return $ret_array;
     }
@@ -114,5 +114,10 @@ class TodoService
         $ret_array = [];
         $todo_obj = Todo::getTodo($todo_id, $user_id);
         return $todo_obj->getArray();
+    }
+
+    public static function getParentTodoIdById($id){
+        $todo = new Todo($id);
+        return $todo->getParentId();
     }
 }
