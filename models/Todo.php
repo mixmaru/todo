@@ -67,16 +67,68 @@ class Todo extends BaseModel
         return $ret_array;
     }
 
+    /**
+     * @return array エラーが有る場合は偉メッセージがかえる
+     */
+    public function save(){
+        $error_msg = $this->validate(); //バリデーション
+        if(empty($error_msg)){
+            if(is_null($this->id)){
+                //登録されるidを先に取得
+                $get_id_sql = "SHOW TABLE STATUS LIKE 'todo'";
+                $res = $this->db->fetch($get_id_sql);
+                $next_id = $res['Auto_increment'];
+                $this->path .= $next_id."/";
+                //新規登録
+                $sql = "INSERT INTO todo "
+                      ."(title, do_date, limit_date, is_done, path, project_id, user_id, created) "
+                      ."VALUES (:title, :do_date, :limit_date, :is_done, :path, :project_id, :user_id, :created) ";
+                $params = [
+                    ':created' => date("Y-m-d H:i:s"),
+                ];
+            }else{
+                //更新
+                $sql = "UPDATE todo SET title = :title, do_date = :do_date, limit_date = :limit_date, is_done = :is_done, "
+                      ."path = :path, project_id = :project_id, user_id = :user_id "
+                      ."WHERE id = :id ";
+                $params = [
+                    ':id' => $this->id,
+                ];
+            }
+            $params = array_merge($params, [
+                ':title' => $this->title,
+                ':do_date' => $this->do_date,
+                ':limit_date' => $this->limit_date,
+                ':is_done' => is_null($this->is_done) ? "UNDONE" : $this->is_done,
+                ':path' => $this->path,
+                ':project_id' => $this->project_id,
+                ':user_id' => $this->user_id,
+            ]);
+            $this->db->execute($sql, $params);
+        }else{
+            return $error_msg;
+        }
+    }
+
     public function validate(){
         $error_msg = [];
-        $error_msg['id'] = $this->validateId();
+        if(!is_null($this->id)){
+            $error_msg['id'] = $this->validateId();
+        }
         $error_msg['title'] = $this->validateTitle();
         $error_msg['do_date'] = $this->validateDoDate();
         $error_msg['limit_date'] = $this->validateLimitDate();
-        $error_msg['is_done'] = $this->validateIsDone();
+        if(!is_null($this->is_done)){
+            $error_msg['is_done'] = $this->validateIsDone();
+        }
         $error_msg['path'] = $this->validatePath();
         $error_msg['user_id'] = $this->validateUserId();
         $error_msg['project_id'] = $this->validateProjectId();
+        foreach($error_msg as $key => $value){
+            if(empty($value)){
+                unset($error_msg[$key]);
+            }
+        }
         return $error_msg;
     }
 
@@ -125,15 +177,6 @@ class Todo extends BaseModel
         return $error_msg;
     }
 
-    public function validatePath(){
-        $error_msg = [];
-        //pathは必須
-        if(!isset($this->path)){
-            $error_msg[] = "pathを正しく指定してください";
-        }
-        return $error_msg;
-    }
-
     public function validateUserId(){
         $error_msg = [];
         //user_idは必須で数値
@@ -157,7 +200,7 @@ class Todo extends BaseModel
         return $error_msg;
     }
 
-    public function validationPath(){
+    public function validatePath(){
         $error_msg = [];
         //パスの構成が正しいかチェック。
         //構成するidのTodoデータ($thisも含めて)のプロジェクトid,user_idが全て同一であるはず。
