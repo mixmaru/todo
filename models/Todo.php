@@ -236,6 +236,17 @@ class Todo extends BaseModel
         return $error_msg;
     }
 
+    /**
+     * pathの深さを返す。/1/2/なら深さ2
+     * pathが設定されていなければfalseを返す
+     */
+    public function getPathDepth(){
+        if(empty($this->path)){
+            return false;
+        }
+        return substr_count($this->path, "/") - 1;
+    }
+
     public static function getTodosByProjectIds(array $project_ids){
         $ret_array = [];
         $clause = implode(",", array_fill(0, count($project_ids), '?'));
