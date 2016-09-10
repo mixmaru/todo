@@ -34,7 +34,9 @@ class Project extends BaseModel{
 
     public function __set($name, $value){
         if(in_array($name, ['id', 'name', 'view_order', 'user_id', 'root_todo_id'])){
-            $this->$name = (in_array($name, ['id', 'view_order', 'user_id', 'root_todo_id'])) ? (int) $value : $value;
+            if(!is_null($value)){
+                $this->$name = (in_array($name, ['id', 'view_order', 'user_id', 'root_todo_id'])) ? (int) $value : $value;
+            }
         }
     }
 
@@ -55,6 +57,11 @@ class Project extends BaseModel{
         $error_msg['view_order'] = $this->validateViewOrder();
         $error_msg['user_id'] = $this->validateUserId();
         $error_msg['root_todo_id'] = $this->validateRootTodoId();
+        foreach($error_msg as $key => $message){
+            if(empty($message)){
+                unset($error_msg[$key]);
+            }
+        }
         return $error_msg;
     }
 
@@ -75,7 +82,8 @@ class Project extends BaseModel{
     }
     public function validateViewOrder(){
         $error_msg = [];
-        if(!(isset($this->view_order) && is_numeric($this->view_order))){
+        //viewOrderは任意。数値。入力されなければ、自動でいれる
+        if(isset($this->view_order) && !is_numeric($this->view_order)){
             $error_msg[] = "並び順を指定してください";
         }
         return $error_msg;
@@ -90,11 +98,61 @@ class Project extends BaseModel{
     }
     public function validateRootTodoId(){
         $error_msg = [];
-        //root_todo_idはint
-        if(isset($this->root_todo_id) && !is_numeric($this->root_todo_id)){
-            $error_msg[] = "ルートTodoは数字で指定してください";
+        //root_todo_idが存在する場合、そのtodoのpathの深さが1で、プロジェクトidが$this->idでなければならない
+        if(!is_null($this->root_todo_id)){
+            $todo = new Todo($this->root_todo_id);
+            if(is_null($todo->id) || $todo->getPathDepth() != 1 || $this->project_id != $this->id){
+                $error_msg[] = "ルートTodo idがただしくありません";
+            }
         }
         return $error_msg;
+    }
+
+    /**
+     * @return array
+     */
+    public function save(){
+        $error_msg = $this->validate(); //バリデーション
+        if(empty($error_msg)){
+            if(is_null($this->view_order)){
+                $this->setNextViewOrder();
+            }
+            if($this->id == -1){
+                //新規登録
+                $sql = "INSERT INTO project (name, view_order, user_id, root_todo_id, created) "
+                      ."VALUES (:name, :view_order, :user_id,:root_todo_id, :created ) ";
+                $params[':created'] = $this->created = date("Y-m-d H:i:s");
+            }else{
+                //更新
+                $sql = "UPDATE project SET name = :name, view_order = :view_order, user_id = :user_id, root_todo_id = :root_todo_id "
+                      ."WHERE id = :id ";
+                $params[':id'] = $this->id;
+            }
+            $params = array_merge($params, [
+                ':name' => $this->name,
+                ':view_order' => $this->view_order,
+                ':user_id' => $this->user_id,
+                ':root_todo_id' => $this->root_todo_id,
+            ]);
+            $this->begin();
+            $this->db->execute($sql, $params);
+            if($this->id == -1){
+                $this->id = $this->db->lastInsertId("id");
+            }
+            //todo: 更新時間を取得する方法をしらべる。
+            $this->commit();
+        }
+        return $error_msg;
+    }
+
+    /**
+     * 同じuser_idのプロジェクトのview_orderの最大値の+100を$this->view_orderにセットする
+     */
+    private function setNextViewOrder(){
+        $max_view_order_sql = "SELECT MAX(view_order) as max_view_order FROM project WHERE user_id = :user_id GROUP BY user_id ";
+        $result = $this->db->fetch($max_view_order_sql, [':user_id' => $this->user_id]);
+        $max_view_order = ($result === false) ? 0 : (int) $result['max_view_order'];
+        $this->view_order = $max_view_order + 100;
     }
 
     static public function getProjectsById(array $ids){
