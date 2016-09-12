@@ -98,10 +98,10 @@ class Project extends BaseModel{
     }
     public function validateRootTodoId(){
         $error_msg = [];
-        //root_todo_idが存在する場合、そのtodoのpathの深さが1で、プロジェクトidが$this->idでなければならない
-        if(!is_null($this->root_todo_id)){
+        //root_todo_idが-1(新しいproject登録で一時的に必要)か、そうでない場合はそのtodoのpathの深さが1で、プロジェクトidが$this->idのtodo_idでなければならない
+        if($this->root_todo_id != -1){
             $todo = new Todo($this->root_todo_id);
-            if(is_null($todo->id) || $todo->getPathDepth() != 1 || $this->project_id != $this->id){
+            if(is_null($todo->id) || $todo->getPathDepth() != 1 || $todo->project_id != $this->id){
                 $error_msg[] = "ルートTodo idがただしくありません";
             }
         }
