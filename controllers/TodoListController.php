@@ -137,18 +137,18 @@ class TodoListController
         $method = $this->request->getMethod();
         if($form->project_id == -1 || $method == "post"){
             //親Todo入力値の取得
-            if($method == "post") $form->parent_todo_id = $this->request->post("parent_todo_id");
-            if($form->validate(TodoEditForm::VALIDATION_LAST_CHECK)){//念のためバリデーション
-                var_dump("登録処理");
+            if($this->request->post("parent_todo_id")){
+                $form->parent_todo_id = $this->request->post("parent_todo_id");
+            }
+            if($form->validate(TodoEditForm::VALIDATION_LAST_CHECK)){
+                TodoService::saveTodo($form);
                 //Todoとプロジェクトの登録処理。
+                $form->temporaryDestroy();
                 //完了画面へリダイレクト
-                $form->temporaryDestroy();
+                header('Location: /?controller=TodoList&action=Finish');
                 return;
-            }elseif(false){
-                //$parent_todo_id以外のエラーがある場合は不正な操作としてエラー
-                $form->temporaryDestroy();
-                $this->renderer->renderError(400);
-                return;
+            }else{
+                $error_message = $form->error_messages;
             }
         }
 
@@ -164,6 +164,15 @@ class TodoListController
             'todos' => $todos,
             'error_message' => $error_message,
             'input_data' => $form->getArray(),
+        ]);
+    }
+
+    /**
+     * Todoデータの更新完了画面
+     */
+    public function actionFinish(){
+        $this->renderer->render("finish", [
+            'page_title' => "編集完了",
         ]);
     }
 

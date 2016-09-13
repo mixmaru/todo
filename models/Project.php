@@ -117,7 +117,7 @@ class Project extends BaseModel{
             if(is_null($this->view_order)){
                 $this->setNextViewOrder();
             }
-            if($this->id == -1){
+            if(is_null($this->id)){
                 //新規登録
                 $sql = "INSERT INTO project (name, view_order, user_id, root_todo_id, created) "
                       ."VALUES (:name, :view_order, :user_id,:root_todo_id, :created ) ";
@@ -136,7 +136,7 @@ class Project extends BaseModel{
             ]);
             $this->begin();
             $this->db->execute($sql, $params);
-            if($this->id == -1){
+            if(is_null($this->id)){
                 $this->id = $this->db->lastInsertId("id");
             }
             //todo: 更新時間を取得する方法をしらべる。

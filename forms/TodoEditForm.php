@@ -29,19 +29,10 @@ class TodoEditForm extends BaseForm
 
     /**
      * @param $validation_mode VALIDATION_PRE_CHECK(Todo登録・編集ページのバリデーション)
-     *                         VALIDATION_LAST_CHECK (登録処理前の最終バリデーション)デフォルト
+     *                         VALIDATION_LAST_CHECK (登録処理前のバリデーション)
      * @return bool
      */
-    public function validate($validation_mode = self::VALIDATION_LAST_CHECK){
-        //新規プロジェクト作成の場合、projectデータのバリデーション
-        if($this->project_id == -1){
-            $project = new Project();
-            $project->id = $this->project_id;
-            $project->name = $this->new_project_name;
-            $this->error_messages['project_id'] = $project->validateId();
-            $this->error_messages['new_project_name'] = $project->validateName();
-        }
-
+    public function validate($validation_mode){
         //todoデータのバリデーション
         $todo = new Todo();
         $todo->id = $this->todo_id;
@@ -50,18 +41,34 @@ class TodoEditForm extends BaseForm
         $todo->do_date = $this->todo_do_date;
         $todo->project_id = $this->project_id;
         $todo->user_id = 1;//todo:ログインシステムをつくるまでは1で決め打ち
-        $this->error_messages['todo_id'] = $todo->validateId();
-        $this->error_messages['todo_title'] = $todo->validateTitle();
-        $this->error_messages['todo_do_date'] = $todo->validateDoDate();
-        $this->error_messages['todo_limit_date'] = $todo->validateLimitDate();
-        $this->error_messages['user_id'] = $todo->validateUserId();
-        $this->error_messages['project_id'] = $todo->validateProjectId();
+
+        //新規プロジェクト作成の場合、projectデータのバリデーション
+        if($validation_mode == self::VALIDATION_PRE_CHECK){
+            if($this->project_id == -1){
+                $project = new Project();
+                $project->id = $this->project_id;
+                $project->name = $this->new_project_name;
+                $this->error_messages['project_id'] = $project->validateId();
+                $this->error_messages['new_project_name'] = $project->validateName();
+            }
+
+            $this->error_messages['todo_id'] = $todo->validateId();
+            $this->error_messages['todo_title'] = $todo->validateTitle();
+            $this->error_messages['todo_do_date'] = $todo->validateDoDate();
+            $this->error_messages['todo_limit_date'] = $todo->validateLimitDate();
+            $this->error_messages['user_id'] = $todo->validateUserId();
+            $this->error_messages['project_id'] = $todo->validateProjectId();
+        }
 
         //登録処理前最終チェック
         if($validation_mode == self::VALIDATION_LAST_CHECK){
             //$parent_todo_idが設定されている場合、そのidは$project_idに属しているものかチェック
-            $todo->setPathByParentTodoId($this->parent_todo_id);
-            $this->error_messages['parent_todo_id'] = $todo->validationPath();
+            if(isset($this->parent_todo_id)){
+                $todo->setPathByParentTodoId($this->parent_todo_id);
+                $this->error_messages['parent_todo_id'] = (empty($todo->validatePath())) ? [] : ["親Todoを正しく指定してください"];
+            }else{
+                $this->error_messages['parent_todo_id'] = ["親Todoを正しく指定してください"];
+            }
         }
 
         foreach($this->error_messages as $key => $value){

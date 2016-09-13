@@ -8,6 +8,8 @@
 
 namespace services;
 
+use forms\TodoEditForm;
+use models\BaseModel;
 use models\Todo;
 use models\Project;
 
@@ -119,5 +121,61 @@ class TodoService
     public static function getParentTodoIdById($id){
         $todo = new Todo($id);
         return $todo->getParentId();
+    }
+
+    /**
+     * Todo編集画面の入力値でDBへ保存する
+     * @param TodoEditForm $form
+     */
+    public static function saveTodo(TodoEditForm $form){
+        //トランザクション開始
+        BaseModel::begin();
+        try{
+            if($form->project_id == -1){
+                var_dump("プロジェクト新規登録");
+                //プロジェクト新規登録
+                $project = new Project();
+                $project->name = $form->new_project_name;
+                $project->user_id = 1;
+                $project->root_todo_id = -1;//既存のtodoであっても、todoのproject_idを変えてからでないと登録できない。バリデーションで弾かれる
+                $error_messages = $project->save();
+                if(!empty($error_messages)){
+                    throw new \Exception("projectの新規登録に失敗");
+                }
+                $form->project_id = $project->id;
+            }
+            //todoを更新
+            if(!is_null($form->todo_id)){
+                $todo = new Todo($form->todo_id);
+            }else{
+                $todo = new Todo();
+            }
+            $todo->title = $form->todo_title;
+            $todo->do_date = $form->todo_do_date;
+            $todo->limit_date = $form->todo_limit_date;
+            if(is_null($form->parent_todo_id)){
+                $todo->setPathRoot();
+            }else{
+                $todo->setPathByParentTodoId($form->parent_todo_id);
+            }
+            $todo->project_id = $form->project_id;
+            $todo->user_id = 1;//todo: ログイン機能ができるまで1で決め打ち
+            $error_messages = $todo->save();
+            if(!empty($error_messages)){
+                throw new \Exception("Todo保存時にバリデーションエラーが発生しました");
+            }
+            //projectが新規登録の場合はここでroot_todo_idを登録する
+//            if($project->root_todo_id == -1){
+//                $project->root_todo_id = $todo->id;
+//                $error_messages = $project->save();
+//                if(!empty($error_messages)){
+//                    throw new \Exception("project保存時にエラーが発生しました");
+//                }
+//            }
+        }catch(\Exception $e){
+            BaseModel::rollback();
+            throw $e;
+        }
+        BaseModel::commit();
     }
 }

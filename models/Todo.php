@@ -213,25 +213,28 @@ class Todo extends BaseModel
                 return $error_msg;
             }
         }
-        //全てのidのtodoオブジェクトを作成する
-        $todo_objects = self::getTodosByIds($todo_ids);
-        $project_ids = [];
-        $user_ids = [];
-        foreach($todo_objects as $todo_obj){
-            $project_ids[] = $todo_obj->project_id;
-            $user_ids[] = $todo_obj->user_id;
-        }
+        if(!empty($todo_ids)){
+            //全てのidのtodoオブジェクトを作成する
+            $todo_objects = self::getTodosByIds($todo_ids);
+            $project_ids = [];
+            $user_ids = [];
+            foreach($todo_objects as $todo_obj){
+                $project_ids[] = $todo_obj->project_id;
+                $user_ids[] = $todo_obj->user_id;
+            }
 
-        //todo:リファクタできそう
-        $uniqued_project_ids = array_unique($project_ids);
-        if(!(count($uniqued_project_ids) == 1 && current($uniqued_project_ids) == $this->project_id)){
-            $error_msg[] = "pathがただしくありません";
-            return $error_msg;
-        }
-        $uniqued_user_ids = array_unique($user_ids);
-        if(!(count($uniqued_user_ids) == 1 && current($uniqued_user_ids) == $this->user_id)){
-            $error_msg[] = "pathがただしくありません";
-            return $error_msg;
+            //todo:リファクタできそう
+            $uniqued_project_ids = array_unique($project_ids);
+            var_dump($uniqued_project_ids, $uniqued_project_ids, $this->project_id);
+            if(!(count($uniqued_project_ids) == 1 && current($uniqued_project_ids) == $this->project_id)){
+                $error_msg[] = "pathがただしくありません";
+                return $error_msg;
+            }
+            $uniqued_user_ids = array_unique($user_ids);
+            if(!(count($uniqued_user_ids) == 1 && current($uniqued_user_ids) == $this->user_id)){
+                $error_msg[] = "pathがただしくありません";
+                return $error_msg;
+            }
         }
         return $error_msg;
     }
@@ -809,6 +812,12 @@ class Todo extends BaseModel
         $this->path = $todo->path;
         if(isset($this->id)){
             $this->path .= $this->id."/";
+        }
+    }
+
+    public function setPathRoot(){
+        if(isset($this->id)){
+            $this->path = "/".$this->id."/";
         }
     }
 }
