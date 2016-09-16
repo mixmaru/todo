@@ -67,8 +67,8 @@ class Project extends BaseModel{
 
     public function validateId(){
         $error_msg = [];
-        //idはintで必須。新規登録の場合は-1が入る
-        if(!(isset($this->id) && is_numeric($this->id))){
+        //idはint。で任意
+        if(isset($this->id) && !is_numeric($this->id)){
             $error_msg[] = "idは数字で指定してください";
         }
         return $error_msg;
@@ -98,8 +98,8 @@ class Project extends BaseModel{
     }
     public function validateRootTodoId(){
         $error_msg = [];
-        //root_todo_idが-1(新しいproject登録で一時的に必要)か、そうでない場合はそのtodoのpathの深さが1で、プロジェクトidが$this->idのtodo_idでなければならない
-        if($this->root_todo_id != -1){
+        //root_todo_idがはいっている場合はそのtodoのpathの深さが1で、プロジェクトidが$this->idのtodo_idでなければならない
+        if(isset($this->root_todo_id)){
             $todo = new Todo($this->root_todo_id);
             if(is_null($todo->id) || $todo->getPathDepth() != 1 || $todo->project_id != $this->id){
                 $error_msg[] = "ルートTodo idがただしくありません";

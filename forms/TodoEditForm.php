@@ -66,7 +66,7 @@ class TodoEditForm extends BaseForm
             if(isset($this->parent_todo_id)){
                 $todo->setPathByParentTodoId($this->parent_todo_id);
                 $this->error_messages['parent_todo_id'] = (empty($todo->validatePath())) ? [] : ["親Todoを正しく指定してください"];
-            }else{
+            }elseif($this->project_id != -1){
                 $this->error_messages['parent_todo_id'] = ["親Todoを正しく指定してください"];
             }
         }

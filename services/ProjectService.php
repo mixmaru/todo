@@ -9,6 +9,7 @@
 namespace services;
 
 use models\Project;
+use models\Todo;
 
 class ProjectService
 {
@@ -30,5 +31,36 @@ class ProjectService
             }
         }
         return $error_msg;
+    }
+
+    public static function createNewProject($name, $user_id){
+        Project::begin();
+        try{
+            //プロジェクト新規登録
+            $project = new Project();
+            $project->name = $name;
+            $project->user_id = $user_id;
+            $error_messages = $project->save();
+            if(!empty($error_messages)){
+                throw new \Exception("projectの新規登録に失敗");
+            }
+
+            //root todo新規登録
+            $todo = new Todo();
+            $error_messages = $todo->makeRootTodo($project->id, $user_id);
+            if(!empty($error_messages)){
+                throw new \Exception("todoの新規登録に失敗");
+            }
+            $project->root_todo_id = $todo->id;
+            $error_messages = $project->save();
+            if(!empty($error_messages)){
+                throw new \Exception("project->root_todo_idの登録に失敗");
+            }
+        }catch(\Exception $e){
+            Project::rollback();
+            throw $e;
+        }
+        Project::commit();
+        return ['project' => $project, 'todo' => $todo];
     }
 }

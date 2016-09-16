@@ -67,6 +67,19 @@ class Todo extends BaseModel
         return $ret_array;
     }
 
+    public function clear(){
+        $this->id = null;
+        $this->title = null;
+        $this->do_date = null;
+        $this->limit_date = null;
+        $this->is_done = null;
+        $this->path = null;
+        $this->project_id = null;
+        $this->user_id = null;
+        $this->created = null;
+        $this->modified = null;
+    }
+
     /**
      * @return array エラーが有る場合は偉メッセージがかえる
      */
@@ -74,11 +87,6 @@ class Todo extends BaseModel
         $error_msg = $this->validate(); //バリデーション
         if(empty($error_msg)){
             if(is_null($this->id)){
-                //登録されるidを先に取得
-                $get_id_sql = "SHOW TABLE STATUS LIKE 'todo'";
-                $res = $this->db->fetch($get_id_sql);
-                $next_id = $res['Auto_increment'];
-                $this->path .= $next_id."/";
                 //新規登録
                 $sql = "INSERT INTO todo "
                       ."(title, do_date, limit_date, is_done, path, project_id, user_id, created) "
@@ -108,6 +116,26 @@ class Todo extends BaseModel
         }else{
             return $error_msg;
         }
+    }
+
+    public function makeRootTodo($project_id, $user_id){
+        $this->clear();
+        $get_next_insert_id_sql = "SHOW TABLE STATUS LIKE 'todo' ";
+        $this->begin();
+        $result = self::$pdo->fetch($get_next_insert_id_sql);
+        $next_insert_id = $result['Auto_increment'];
+        $this->title = "project_root";
+        $this->path = "/".$next_insert_id."/";
+        $this->project_id = $project_id;
+        $this->user_id = $user_id;
+        $error_msg = $this->save();
+        if(!empty($error_msg)){
+            $this->rollback();
+        }else{
+            $this->commit();
+            $this->id = $next_insert_id;
+        }
+        return $error_msg;
     }
 
     public function validate(){
@@ -212,28 +240,27 @@ class Todo extends BaseModel
                 $error_msg[] = "pathがただしくありません";
                 return $error_msg;
             }
-        }
-        if(!empty($todo_ids)){
-            //全てのidのtodoオブジェクトを作成する
-            $todo_objects = self::getTodosByIds($todo_ids);
-            $project_ids = [];
-            $user_ids = [];
-            foreach($todo_objects as $todo_obj){
-                $project_ids[] = $todo_obj->project_id;
-                $user_ids[] = $todo_obj->user_id;
-            }
+            if(!empty($todo_ids)){
+                //全てのidのtodoオブジェクトを作成する
+                $todo_objects = self::getTodosByIds($todo_ids);
+                $project_ids = [];
+                $user_ids = [];
+                foreach($todo_objects as $todo_obj){
+                    $project_ids[] = $todo_obj->project_id;
+                    $user_ids[] = $todo_obj->user_id;
+                }
 
-            //todo:リファクタできそう
-            $uniqued_project_ids = array_unique($project_ids);
-            var_dump($uniqued_project_ids, $uniqued_project_ids, $this->project_id);
-            if(!(count($uniqued_project_ids) == 1 && current($uniqued_project_ids) == $this->project_id)){
-                $error_msg[] = "pathがただしくありません";
-                return $error_msg;
-            }
-            $uniqued_user_ids = array_unique($user_ids);
-            if(!(count($uniqued_user_ids) == 1 && current($uniqued_user_ids) == $this->user_id)){
-                $error_msg[] = "pathがただしくありません";
-                return $error_msg;
+                //todo:リファクタできそう
+                $uniqued_project_ids = array_unique($project_ids);
+                if(!(count($uniqued_project_ids) == 1 && current($uniqued_project_ids) == $this->project_id)){
+                    $error_msg[] = "pathがただしくありません";
+                    return $error_msg;
+                }
+                $uniqued_user_ids = array_unique($user_ids);
+                if(!(count($uniqued_user_ids) == 1 && current($uniqued_user_ids) == $this->user_id)){
+                    $error_msg[] = "pathがただしくありません";
+                    return $error_msg;
+                }
             }
         }
         return $error_msg;
@@ -812,12 +839,6 @@ class Todo extends BaseModel
         $this->path = $todo->path;
         if(isset($this->id)){
             $this->path .= $this->id."/";
-        }
-    }
-
-    public function setPathRoot(){
-        if(isset($this->id)){
-            $this->path = "/".$this->id."/";
         }
     }
 }
