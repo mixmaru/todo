@@ -180,8 +180,8 @@ class Todo extends BaseModel
 
     public function validateDoDate(){
         $error_msg = [];
-        //do_dateは日付
-        if(isset($this->do_date) && $this->do_date != date("Y-m-d", strtotime($this->do_date))){
+        //セットされていればdo_dateは日付
+        if(!is_null($this->do_date) && $this->do_date != date("Y-m-d", strtotime($this->do_date))){
             $error_msg[] = "正しい日付を指定してください";
         }
         return $error_msg;
@@ -189,8 +189,8 @@ class Todo extends BaseModel
 
     public function validateLimitDate(){
         $error_msg = [];
-        //limit_dateは日付
-        if(isset($this->limit_date) && $this->limit_date != date("Y-m-d", strtotime($this->limit_date))){
+        //セットされていればlimit_dateは日付
+        if(!is_null($this->limit_date) && $this->limit_date != date("Y-m-d", strtotime($this->limit_date))){
             $error_msg[] = "正しい日付を指定してください";
         }
         return $error_msg;

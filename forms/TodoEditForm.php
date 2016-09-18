@@ -79,6 +79,16 @@ class TodoEditForm extends BaseForm
         return empty($this->error_messages) ? true : false;
     }
 
+    public function loadArray(array $properties)
+    {
+        foreach(['todo_limit_date', 'todo_do_date'] as $key){
+            if(!key_exists($key, $properties) || $properties[$key] == ""){
+                $properties[$key] = null;
+            }
+        }
+        parent::loadArray($properties);
+    }
+
     public function temporarySave(){
         $session = new Session();
         $session->set(self::TEMP_SAVE_SESSION_KEY, $this->getArray());
