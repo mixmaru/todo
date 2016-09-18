@@ -81,7 +81,7 @@ class TodoEditForm extends BaseForm
 
     public function loadArray(array $properties)
     {
-        foreach(['todo_limit_date', 'todo_do_date'] as $key){
+        foreach(['todo_id', 'todo_limit_date', 'todo_do_date'] as $key){
             if(!key_exists($key, $properties) || $properties[$key] == ""){
                 $properties[$key] = null;
             }

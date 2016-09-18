@@ -156,7 +156,7 @@ class TodoListController
         //プロジェクトidから全てのtodoデータを取得する。
         $todos = TodoService::getTodoListByProjectId($form->project_id);
         //親Todoのidを取得する
-        $target_parent_todo_id = ($form->todo_id == -1) ? false : TodoService::getParentTodoIdById($form->todo_id);
+        $target_parent_todo_id = (is_null($form->todo_id)) ? null : TodoService::getParentTodoIdById($form->todo_id);
 
         $this->renderer->render("parent_todo_modify", [
             'page_title' => "親Todo編集",
